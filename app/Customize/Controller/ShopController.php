@@ -103,6 +103,7 @@ class ShopController extends AbstractController
 				$shop->setUrl($form_data["url"]);
 				$shop->setQuestion($form_data["question"]);
 				$shop->setMemberId($Member->getId());
+				$shop->setToken(Shop::generateRandomString(16));
 
 				$em = $this->getDoctrine()->getManager();
 				$em->persist($shop);
@@ -120,4 +121,6 @@ class ShopController extends AbstractController
 			"form" => $form->createView()
 		];
 	}
+
+
 }

@@ -65,6 +65,29 @@ class Shop extends \Eccube\Entity\AbstractEntity
      */
     private $postCode;
 
+	/**
+	 * @var string|null
+	 *
+	 * @ORM\Column(name="token", type="string", length=16, nullable=true)
+	 */
+	private $token;
+
+	/**
+	 * @return null|string
+	 */
+	public function getToken(): ?string
+	{
+		return $this->token;
+	}
+
+	/**
+	 * @param null|string $token
+	 */
+	public function setToken(?string $token): void
+	{
+		$this->token = $token;
+	}
+
     /**
      * @var int|null
      *
@@ -1210,6 +1233,11 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public function setUpdateDate(?\DateTime $updateDate): void
 	{
 		$this->updateDate = $updateDate;
+	}
+
+
+	public static function generateRandomString($length = 10) {
+		return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
 	}
 
 
