@@ -47,9 +47,9 @@ class Shop extends \Eccube\Entity\AbstractEntity
     /**
      * @var string|null
      *
-     * @ORM\Column(name="persion_in_charge", type="text", length=65535, nullable=true, options={"comment"="担当者名"})
+     * @ORM\Column(name="person_in_charge", type="text", length=65535, nullable=true, options={"comment"="担当者名"})
      */
-    private $persionInCharge;
+    private $personInCharge;
 
     /**
      * @var int|null
@@ -470,17 +470,17 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return null|string
 	 */
-	public function getPersionInCharge(): ?string
+	public function getPersonInCharge(): ?string
 	{
-		return $this->persionInCharge;
+		return $this->personInCharge;
 	}
 
 	/**
-	 * @param null|string $persionInCharge
+	 * @param null|string $personInCharge
 	 */
-	public function setPersionInCharge(?string $persionInCharge): void
+	public function setPersonInCharge(?string $personInCharge): void
 	{
-		$this->persionInCharge = $persionInCharge;
+		$this->personInCharge = $personInCharge;
 	}
 
 	/**

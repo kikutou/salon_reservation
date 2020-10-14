@@ -1,5 +1,12 @@
 parameters:
     eccube_nav:
+        shop:
+            name: 加盟店管理
+            icon: fa-cube
+            children:
+                shop_master:
+                    name: 加盟店一覧
+                    url: admin_shop
         product:
             name: admin.product.product_management
             icon: fa-cube

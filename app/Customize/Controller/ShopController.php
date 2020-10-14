@@ -92,7 +92,7 @@ class ShopController extends AbstractController
 				$shop = new Shop();
 				$shop->setName($form_data["name"]);
 				$shop->setEmail($form_data["email"]);
-				$shop->setPersionInCharge($form_data["person_in_charge"]);
+				$shop->setPersonInCharge($form_data["person_in_charge"]);
 				$shop->setUrl($form_data["url"]);
 				$shop->setOpenStatus($form_data["open_status"]);
 				$shop->setIndustryType($form_data["industry_type"]);
@@ -103,6 +103,10 @@ class ShopController extends AbstractController
 				$shop->setUrl($form_data["url"]);
 				$shop->setQuestion($form_data["question"]);
 				$shop->setMemberId($Member->getId());
+
+				$shop->setPublicStatus(1);
+				$shop->setAuthenticatedByAdmin(1);
+
 				$shop->setToken(Shop::generateRandomString(16));
 
 				$em = $this->getDoctrine()->getManager();
