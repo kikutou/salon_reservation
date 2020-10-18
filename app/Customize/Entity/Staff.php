@@ -101,9 +101,9 @@ class Staff extends \Eccube\Entity\AbstractEntity
     /**
      * @var string|null
      *
-     * @ORM\Column(name="images_2", type="text", length=65535, nullable=true)
+     * @ORM\Column(name="image_2", type="text", length=65535, nullable=true)
      */
-    private $images2;
+    private $image2;
 
     /**
      * @var string|null
@@ -115,9 +115,9 @@ class Staff extends \Eccube\Entity\AbstractEntity
     /**
      * @var string|null
      *
-     * @ORM\Column(name="images_3", type="text", length=65535, nullable=true)
+     * @ORM\Column(name="image_3", type="text", length=65535, nullable=true)
      */
-    private $images3;
+    private $image3;
 
     /**
      * @var string|null
@@ -363,17 +363,17 @@ class Staff extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return null|string
 	 */
-	public function getImages2(): ?string
+	public function getImage2(): ?string
 	{
-		return $this->images2;
+		return $this->image2;
 	}
 
 	/**
-	 * @param null|string $images2
+	 * @param null|string $image2
 	 */
-	public function setImages2(?string $images2): void
+	public function setImage2(?string $image2): void
 	{
-		$this->images2 = $images2;
+		$this->image2 = $image2;
 	}
 
 	/**
@@ -395,17 +395,17 @@ class Staff extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return null|string
 	 */
-	public function getImages3(): ?string
+	public function getImage3(): ?string
 	{
-		return $this->images3;
+		return $this->image3;
 	}
 
 	/**
-	 * @param null|string $images3
+	 * @param null|string $image3
 	 */
-	public function setImages3(?string $images3): void
+	public function setImage3(?string $image3): void
 	{
-		$this->images3 = $images3;
+		$this->image3 = $image3;
 	}
 
 	/**

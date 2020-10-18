@@ -7,6 +7,16 @@ parameters:
                 shop_master:
                     name: 加盟店一覧
                     url: admin_shop
+        staff:
+            name: スタッフ管理
+            icon: fa-users
+            children:
+                staff_master:
+                    name: スタッフ一覧
+                    url: admin_staff
+                staff_edit:
+                    name: スタッフ登録
+                    url: admin_staff_new
         product:
             name: admin.product.product_management
             icon: fa-cube

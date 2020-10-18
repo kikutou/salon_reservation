@@ -34,5 +34,24 @@ class StaffRepository extends \Eccube\Repository\AbstractRepository
         parent::__construct($registry, Staff::class);
     }
 
+    public function getQueryBuilderBySearchData($searchData)
+	{
+		$qb = $this->createQueryBuilder('s')
+			->select('s');
+
+
+		return $qb;
+    }
+    
+    /**
+     * @param $Staff
+     */
+    public function save($Staff)
+    {
+        $em = $this->getEntityManager();
+        $em->persist($Staff);
+        $em->flush($Staff);
+    }
+
 
 }

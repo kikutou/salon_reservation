@@ -1,0 +1,497 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+
+{% extends '@admin/default_frame.twig' %}
+
+{% set menus = ['staff', 'staff_edit'] %}
+
+{% block title %}スタッフ情報{% endblock %}
+{% block sub_title %}スタッフ情報登録{% endblock %}
+
+{% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
+
+{% block javascript %}
+    <script src="//yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+    <script>
+        // アップロードするファイルを選択
+        $('input[type=file]').each(function(index, ele){
+            $(this).change(function() {
+                var imgName = '#' + $(this).attr('data-img');
+                var file = $(this).prop('files')[0];
+
+                // 画像以外は処理を停止
+                if (! file.type.match('image.*')) {
+                    // クリア
+                    $(this).val('');
+                    $(imgName).html('');
+                    return;
+                }
+
+                // 画像表示
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var img_src = $('<img>').attr('src', reader.result);
+                    $(imgName).html(img_src);
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+{% endblock javascript %}
+
+{% block main %}
+
+    <form name="staff_form" role="form" id="staff_form" method="post" class="h-adr"
+        action={% if app.request.get('id') %} "{{ url('admin_staff_edit', { id : Staff.id }) }}" {% else %} "{{ url('admin_staff_new') }}" {% endif %}
+        novalidate enctype="multipart/form-data"> 
+        <span class="p-country-name" style="display:none;">Japan</span>
+        {{ form_widget(form._token) }}
+        <div class="c-contentsArea__cols">
+            <div class="c-contentsArea__primaryCol">
+                <div class="c-primaryCol">
+                    <div class="card rounded border-0 mb-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-8"><span class="card-title">スタッフ情報</span>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <a data-toggle="collapse" href="#ordererInfo"
+                                       aria-expanded="false" aria-controls="ordererInfo">
+                                        <i class="fa fa-angle-up fa-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse show ec-cardCollapse" id="ordererInfo">
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>名前</span>
+                                        <span class="badge badge-primary ml-1">{{ 'admin.common.required'|trans }}</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.name) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.name) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>スタッフ写真</span>
+                                    </div>
+                                    <div class="col">
+                                        <span id="staff_image">
+                                        {% if app.request.get('id') and Staff.image is not null %}
+                                            <img src="{{ asset(Staff.image|no_image_product, 'save_image') }}">
+                                        {% endif %}
+                                        </span>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.image, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'staff_image' }}) }}
+                                                {{ form_errors(form.image) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>紹介</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.title) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.title) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>紹介文</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.introduction) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.introduction) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>スタイリスト歴</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.experience) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.experience) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>得意なイメージ</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.style) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.style) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>得意な技術</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.skills) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.skills) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>興味</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.hobbies) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.hobbies) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                               <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>写真1</span>
+                                    </div>
+                                    <div class="col">
+                                        <span id="image_1">
+                                        {% if app.request.get('id') and Staff.image1 is not null %}
+                                            <img src="{{ asset(Staff.image1|no_image_product, 'save_image') }}">
+                                        {% endif %}
+                                        </span>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.image1, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_1'}}) }}
+                                                {{ form_errors(form.image1) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image1').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>説明文1</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.comment1) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.comment1) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>写真2</span>
+                                    </div>
+                                    <div class="col">
+                                        <span id="image_2">
+                                        {% if app.request.get('id') and Staff.image2 is not null %}
+                                            <img src="{{ asset(Staff.image2|no_image_product, 'save_image') }}">
+                                        {% endif %}
+                                        </span>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.image2, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_2'}}) }}
+                                                {{ form_errors(form.image2) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image2').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>説明文2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.comment2) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.comment2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>写真3</span>
+                                    </div>
+                                    <div class="col">
+                                        <span id="image_3">
+                                        {% if app.request.get('id') and Staff.image3 is not null %}
+                                            <img src="{{ asset(Staff.image3|no_image_product, 'save_image') }}">
+                                        {% endif %}
+                                        </span>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.image3, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_3'}}) }}
+                                                {{ form_errors(form.image3) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image3').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>説明文3</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.comment3) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.comment3) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>写真4</span>
+                                    </div>
+                                    <div class="col">
+                                        <span id="image_4">
+                                        {% if app.request.get('id') and Staff.image4 is not null %}
+                                            <img src="{{ asset(Staff.image4|no_image_product, 'save_image') }}">
+                                        {% endif %}
+                                        </span>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.image4, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_4'}}) }}
+                                                {{ form_errors(form.image4) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image4').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>説明文4</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.comment4) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.comment4) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>営業時間</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.businessHours) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.businessHours) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                {# エンティティ拡張の自動出力 #}
+                                {% for f in form if f.vars.eccube_form_options.auto_render %}
+                                    {% if f.vars.eccube_form_options.form_theme %}
+                                        {% form_theme f f.vars.eccube_form_options.form_theme %}
+                                        {{ form_row(f) }}
+                                    {% else %}
+                                        <div class="row mb-2">
+                                            <div class="col-3">
+                                                <span>{{ f.vars.label|trans }}</span>
+                                            </div>
+                                            <div class="col">
+                                                {{ form_widget(f) }}
+                                                {{ form_errors(f) }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="card rounded border-0 mb-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="d-inline-block" data-tooltip="true" data-placement="top"
+                                         title="スタッフ用のメモ欄です。フロント側には表示されません。">
+                                        <span class="card-title">スタッフ用メモ欄</span>
+                                        <i class="fa fa-question-circle fa-lg ml-1"></i>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <a data-toggle="collapse" href="#shopMemo" aria-expanded="false"
+                                       aria-controls="shopMemo">
+                                        <i class="fa fa-angle-up fa-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse show ec-cardCollapse" id="shopMemo">
+                            <div class="card-body">
+                                {{ form_widget(form.memo, { 'attr': { 'row': 8 }}) }}
+                                {{ form_errors(form.memo) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="c-conversionArea">
+            <div class="c-conversionArea__container">
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-6">
+                        <div class="c-conversionArea__leftBlockItem">
+                            <a class="c-baseLink"
+                               href="{{ url('admin_staff_page', { page_no : app.session.get('eccube.admin.customer.search.page_no')|default('1') } ) }}?resume=1">
+                                <i class="fa fa-backward" aria-hidden="true"></i>
+                                <span>スタッフ一覧</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div id="ex-conversion-action" class="row align-items-center justify-content-end">
+                            {#<div class="col-auto">#}
+                                {#{{ form_widget(form.status) }}#}
+                                {#{{ form_errors(form.status) }}#}
+                            {#</div>#}
+                            <div class="col-auto">
+                                <button class="btn btn-ec-conversion px-5"
+                                        type="submit">{{ 'admin.common.registration'|trans }}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
