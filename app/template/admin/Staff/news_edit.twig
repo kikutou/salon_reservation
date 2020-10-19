@@ -18,9 +18,28 @@ file that was distributed with this source code.
 
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 
+{% block stylesheet %}
+    <style>
+        .delete-image {
+            margin: 5px;
+        }
+        .divx {
+            cursor: pointer;
+            background-color: #FFFFFF;
+            opacity:0.5;
+            width: 30px;
+            height: 20px;
+            position:absolute;
+            top:0;
+            left:380px;
+        }
+    </style>
+{% endblock stylesheet %}
+
 {% block javascript %}
     <script src="//yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     <script>
+        var delete_images = []
         // アップロードするファイルを選択
         $('input[type=file]').each(function(index, ele){
             $(this).change(function() {
@@ -38,12 +57,31 @@ file that was distributed with this source code.
                 // 画像表示
                 var reader = new FileReader();
                 reader.onload = function() {
-                    var img_src = $('<img>').attr('src', reader.result);
+                    var img_src = '<div style="position:relative">' 
+                    + '<img src=' + reader.result + ' width="400" height="400">'
+                    + '<div class="divx delete_img">'
+                    + '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a></div></div>';
                     $(imgName).html(img_src);
                 }
                 reader.readAsDataURL(file);
+                // 画像削除
+                $(imgName).on('click','.delete_img', function(){
+                    $(this).parent().remove();
+                    var tagName = '#admin_staff_' + imgName.slice(1) ;
+                    $(tagName).val('');
+                });
             });
         });
+
+        // 元画像削除
+        $('.delete_origin_img').click(function(){
+            $(this).parent().remove();
+            var eleName = $(this).attr('data-img');
+            delete_images.push(eleName);
+            $('[name="image_delete_flg"]').val(delete_images);
+        });
+        
+        
     </script>
 {% endblock javascript %}
 
@@ -52,6 +90,7 @@ file that was distributed with this source code.
     <form name="staff_form" role="form" id="staff_form" method="post" class="h-adr"
         action={% if app.request.get('id') %} "{{ url('admin_staff_edit', { id : Staff.id }) }}" {% else %} "{{ url('admin_staff_new') }}" {% endif %}
         novalidate enctype="multipart/form-data"> 
+        <input type="hidden" name="image_delete_flg" value="">
         <span class="p-country-name" style="display:none;">Japan</span>
         {{ form_widget(form._token) }}
         <div class="c-contentsArea__cols">
@@ -83,6 +122,7 @@ file that was distributed with this source code.
                                                 {{ form_widget(form.name) }}
                                             </div>
                                         </div>
+                                        
                                         <div class="row">
                                             <div class="col">
                                                 {{ form_errors(form.name) }}
@@ -96,16 +136,21 @@ file that was distributed with this source code.
                                         <span>スタッフ写真</span>
                                     </div>
                                     <div class="col">
-                                        <span id="staff_image">
+                                        <span id="image">
                                         {% if app.request.get('id') and Staff.image is not null %}
-                                            <img src="{{ asset(Staff.image|no_image_product, 'save_image') }}">
+                                            <div style="position:relative">
+                                                <img src="{{ asset(Staff.image|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <div class="divx delete_origin_img" data-img="image">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
                                         {% endif %}
                                         </span>
                                         <div class="media py-5 border-ec-dashed mb-2 rounded">
                                             <div class="media-body">
                                                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                                                 画像を
-                                                {{ form_widget(form.image, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'staff_image' }}) }}
+                                                {{ form_widget(form.image, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image' }}) }}
                                                 {{ form_errors(form.image) }}
                                                 <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image').click()">
                                                     {{ 'admin.common.file_select'|trans }}
@@ -230,16 +275,21 @@ file that was distributed with this source code.
                                         <span>写真1</span>
                                     </div>
                                     <div class="col">
-                                        <span id="image_1">
+                                        <span id="image1">
                                         {% if app.request.get('id') and Staff.image1 is not null %}
-                                            <img src="{{ asset(Staff.image1|no_image_product, 'save_image') }}">
+                                            <div style="position:relative">
+                                                <img src="{{ asset(Staff.image1|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <div class="divx delete_origin_img" data-img="image1">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
                                         {% endif %}
                                         </span>
                                         <div class="media py-5 border-ec-dashed mb-2 rounded">
                                             <div class="media-body">
                                                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                                                 画像を
-                                                {{ form_widget(form.image1, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_1'}}) }}
+                                                {{ form_widget(form.image1, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image1'}}) }}
                                                 {{ form_errors(form.image1) }}
                                                 <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image1').click()">
                                                     {{ 'admin.common.file_select'|trans }}
@@ -272,16 +322,21 @@ file that was distributed with this source code.
                                         <span>写真2</span>
                                     </div>
                                     <div class="col">
-                                        <span id="image_2">
+                                        <span id="image2">
                                         {% if app.request.get('id') and Staff.image2 is not null %}
-                                            <img src="{{ asset(Staff.image2|no_image_product, 'save_image') }}">
+                                            <div style="position:relative">
+                                                <img src="{{ asset(Staff.image2|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <div class="divx delete_origin_img" data-img="image2">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div> 
                                         {% endif %}
                                         </span>
                                         <div class="media py-5 border-ec-dashed mb-2 rounded">
                                             <div class="media-body">
                                                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                                                 画像を
-                                                {{ form_widget(form.image2, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_2'}}) }}
+                                                {{ form_widget(form.image2, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image2'}}) }}
                                                 {{ form_errors(form.image2) }}
                                                 <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image2').click()">
                                                     {{ 'admin.common.file_select'|trans }}
@@ -314,16 +369,21 @@ file that was distributed with this source code.
                                         <span>写真3</span>
                                     </div>
                                     <div class="col">
-                                        <span id="image_3">
+                                        <span id="image3">
                                         {% if app.request.get('id') and Staff.image3 is not null %}
-                                            <img src="{{ asset(Staff.image3|no_image_product, 'save_image') }}">
+                                            <div style="position:relative">
+                                                <img src="{{ asset(Staff.image3|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <div class="divx delete_origin_img" data-img="image3">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
                                         {% endif %}
                                         </span>
                                         <div class="media py-5 border-ec-dashed mb-2 rounded">
                                             <div class="media-body">
                                                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                                                 画像を
-                                                {{ form_widget(form.image3, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_3'}}) }}
+                                                {{ form_widget(form.image3, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image3'}}) }}
                                                 {{ form_errors(form.image3) }}
                                                 <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image3').click()">
                                                     {{ 'admin.common.file_select'|trans }}
@@ -356,16 +416,21 @@ file that was distributed with this source code.
                                         <span>写真4</span>
                                     </div>
                                     <div class="col">
-                                        <span id="image_4">
+                                        <span id="image4">
                                         {% if app.request.get('id') and Staff.image4 is not null %}
-                                            <img src="{{ asset(Staff.image4|no_image_product, 'save_image') }}">
+                                            <div style="position:relative">
+                                                <img src="{{ asset(Staff.image4|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <div class="divx delete_origin_img" data-img="image4">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
                                         {% endif %}
                                         </span>
                                         <div class="media py-5 border-ec-dashed mb-2 rounded">
                                             <div class="media-body">
                                                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                                                 画像を
-                                                {{ form_widget(form.image4, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image_4'}}) }}
+                                                {{ form_widget(form.image4, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'image4'}}) }}
                                                 {{ form_errors(form.image4) }}
                                                 <a class="btn btn-ec-regular mr-2" onclick="$('#admin_staff_image4').click()">
                                                     {{ 'admin.common.file_select'|trans }}

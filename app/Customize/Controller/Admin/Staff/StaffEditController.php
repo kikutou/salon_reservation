@@ -28,6 +28,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Filesystem\Filesystem;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -60,16 +61,41 @@ class StaffEditController extends AbstractController
      */
     public function index(Request $request, $id = null)
     {
-        
+        $delete_images = [];
         // 編集
         if ($id) {
             $Staff = $this->staffRepository->find($id);
+            
+            // 削除されたファイル名を取得
+            if ($request->get('image_delete_flg') != '') {
+                $image_delete_flgs = explode(',', $request->get('image_delete_flg'));
+                if (in_array('image', $image_delete_flgs)) {
+                    $delete_images[] = $Staff->getImage();
+                    $Staff->setImage(null);
+                } 
+                if (in_array('image1', $image_delete_flgs)) {
+                    $delete_images[] = $Staff->getImage1();
+                    $Staff->setImage1(null);
+                }
+                if (in_array('image2', $image_delete_flgs)) {
+                    $delete_images[] = $Staff->getImage2();
+                    $Staff->setImage2(null);
+                }
+                if (in_array('image3', $image_delete_flgs)) {
+                    $delete_images[] = $Staff->getImage3();
+                    $Staff->setImage3(null);
+                }
+                if (in_array('image4', $image_delete_flgs)) {
+                    $delete_images[] = $Staff->getImage4();
+                    $Staff->setImage4(null);
+                }
+            }
 
             if (is_null($Staff)) {
                 throw new NotFoundHttpException();
             }
 
-        // 新規登録なし
+        // 新規登録
         } else {
             $Staff = new Staff();
             $Staff->setCreateDate(new \DateTime());
@@ -128,7 +154,13 @@ class StaffEditController extends AbstractController
                 $file = new File($this->eccubeConfig['eccube_temp_image_dir']. '/'. $filename);
                 $file->move($this->eccubeConfig['eccube_save_image_dir']);
             }
-           
+
+            // ファイル削除
+            foreach ($delete_images as $delete_image) {
+                $fileDelete = new Filesystem();
+                $fileDelete->remove($this->eccubeConfig['eccube_save_image_dir']. '/'. $delete_image);
+            }
+            
             return $this->redirectToRoute('admin_staff_edit', [
                 'id' => $Staff->getId(),
             ]);
