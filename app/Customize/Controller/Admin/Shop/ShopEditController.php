@@ -63,6 +63,12 @@ class ShopEditController extends AbstractController
                 throw new NotFoundHttpException();
             }
 
+	        if(($this->getUser()->getAuthority()->getId() == 2)) {
+		        if($Shop->getMemberId() != $this->getUser()->getId()) {
+			        throw new NotFoundHttpException();
+		        }
+	        }
+
         // 新規登録なし
         } else {
 	        throw new NotFoundHttpException();
