@@ -38,7 +38,7 @@ class ShopRepository extends \Eccube\Repository\AbstractRepository
 	public function getQueryBuilderBySearchData($searchData)
 	{
 		$qb = $this->createQueryBuilder('c')
-			->select('c');
+			->select('c')->where("1=1");
 
 
 		return $qb;

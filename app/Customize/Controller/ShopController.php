@@ -171,9 +171,6 @@ class ShopController extends AbstractController
 
 		return $this->render("Shop/entry_fail.twig", []);
 
-
-
-
 	}
 
 
