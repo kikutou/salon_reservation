@@ -61,35 +61,17 @@ class StaffEditController extends AbstractController
      */
     public function index(Request $request, $id = null)
     {
-        $delete_images = [];
         // 編集
         if ($id) {
             $Staff = $this->staffRepository->find($id);
-            
-            // 削除されたファイル名を取得
-            if ($request->get('image_delete_flg') != '') {
-                $image_delete_flgs = explode(',', $request->get('image_delete_flg'));
-                if (in_array('image', $image_delete_flgs)) {
-                    $delete_images[] = $Staff->getImage();
-                    $Staff->setImage(null);
-                } 
-                if (in_array('image1', $image_delete_flgs)) {
-                    $delete_images[] = $Staff->getImage1();
-                    $Staff->setImage1(null);
-                }
-                if (in_array('image2', $image_delete_flgs)) {
-                    $delete_images[] = $Staff->getImage2();
-                    $Staff->setImage2(null);
-                }
-                if (in_array('image3', $image_delete_flgs)) {
-                    $delete_images[] = $Staff->getImage3();
-                    $Staff->setImage3(null);
-                }
-                if (in_array('image4', $image_delete_flgs)) {
-                    $delete_images[] = $Staff->getImage4();
-                    $Staff->setImage4(null);
-                }
-            }
+            // 元ファイル名を取得
+            $originImages = [
+                'image' => $Staff->getImage(),
+                'image1' => $Staff->getImage1(),
+                'image2' => $Staff->getImage2(),
+                'image3' => $Staff->getImage3(),
+                'image4' => $Staff->getImage4(),
+            ];
 
             if (is_null($Staff)) {
                 throw new NotFoundHttpException();
@@ -111,12 +93,19 @@ class StaffEditController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $files = [];
+            $delete_images = [];
+            $image_delete_flgs = [];
             $Staff = $form->getData();
             // 画像
             $images = $request->files->get('admin_staff');
             $allowExtensions = ['gif', 'jpg', 'jpeg', 'png'];
-            $files = [];
             
+            // 削除ありの場合
+            if ($request->get('image_delete_flg') != '') {
+                $image_delete_flgs = explode(',', $request->get('image_delete_flg'));
+            }
+            // ファイルアップロードあり
             if (count($images) > 0) {
                 foreach ($images as $key => $image) {
                     if (!is_null($image)) {
@@ -129,7 +118,7 @@ class StaffEditController extends AbstractController
                         $tmpFileName = date('mdHis').uniqid('_'). '.'. $extension;
                         // テンプファイル保存
                         $image->move($this->eccubeConfig['eccube_temp_image_dir'], $tmpFileName);
-                        $files[] = $tmpFileName;
+                        $files[$key] = $tmpFileName;
                         if ($key == 'image') {
                             $Staff->setImage($tmpFileName);
                         } elseif ($key == 'image1') {
@@ -141,8 +130,33 @@ class StaffEditController extends AbstractController
                         } elseif ($key == 'image4') {
                             $Staff->setImage4($tmpFileName);
                         }
+                        // 画像引き換えの場合
+                        if ($id && !is_null($originImages[$key]) && !in_array($key, $image_delete_flgs)) {
+                            $delete_images[] = $originImages[$key];
+                        }
                     }
                 }
+            }
+
+            // 削除されたファイル名を取得
+            foreach ($image_delete_flgs as $image_delete_flg) {
+                $delete_images[] = $originImages[$image_delete_flg];
+            }
+            // 削除あり&アップロードなしの場合、null設定
+            if (in_array('image', $image_delete_flgs) && !array_key_exists('image', $files)) {
+                $Staff->setImage(null);
+            } 
+            if (in_array('image1', $image_delete_flgs) && !array_key_exists('image1', $files)) {
+                $Staff->setImage1(null);
+            }
+            if (in_array('image2', $image_delete_flgs) && !array_key_exists('image2', $files)) {
+                $Staff->setImage2(null);
+            }
+            if (in_array('image3', $image_delete_flgs) && !array_key_exists('image3', $files)) {
+                $Staff->setImage3(null);
+            }
+            if (in_array('image4', $image_delete_flgs) && !array_key_exists('image4', $files)) {
+                $Staff->setImage4(null);
             }
             
             $this->staffRepository->save($Staff);

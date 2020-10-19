@@ -67,7 +67,7 @@ file that was distributed with this source code.
                 // 画像削除
                 $(imgName).on('click','.delete_img', function(){
                     $(this).parent().remove();
-                    var tagName = '#admin_staff_' + imgName.slice(1) ;
+                    var tagName = '#admin_staff_' + imgName.slice(1);
                     $(tagName).val('');
                 });
             });
@@ -78,7 +78,7 @@ file that was distributed with this source code.
             $(this).parent().remove();
             var eleName = $(this).attr('data-img');
             delete_images.push(eleName);
-            $('[name="image_delete_flg"]').val(delete_images);
+            $('[name="image_delete_flg"]').val(delete_images.join(','));
         });
         
         
