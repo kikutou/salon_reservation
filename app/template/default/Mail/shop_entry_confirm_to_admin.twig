@@ -1,0 +1,42 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% autoescape false %}
+※本メールは自動配信メールです。
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+　※本メールは、
+　{{ BaseInfo.shop_name }}より会員登録を希望された方に
+　お送りしています。
+　もしお心当たりが無い場合はこのままこのメールを破棄していただ
+　ければ会員登録はなされません。
+　またその旨 {{ BaseInfo.email02 }} まで
+　ご連絡いただければ幸いです。
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+管理員 様
+
+以下の店舗が掲載登録を申請しています。
+
+店舗名：            {{ Shop.name }}
+開業状況：          {{ Shop.openStatus == 1 ? "開業ずみ" : "開業予定" }}
+ご担当者：          {{ Shop.personInCharge }}
+業種：             {{ Shop.industryTypeName }}
+住所：             〒{{ Shop.postCode }} {{ Shop.pref.name }}{{ Shop.address }}
+電話：             {{ Shop.telephone }}
+メールアドレス：     {{ Shop.email }}
+店舗URL：          {{ Shop.email }}
+質問・要望          {{ Shop.question|nl2br }}
+
+
+ご確認いただき、問題がなければ、以下のリンクより、承認してください。
+{{ activateUrl }}
+
+{% endautoescape %}

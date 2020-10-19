@@ -3,6 +3,8 @@
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Eccube\Entity\Master\Pref;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * Shop
@@ -402,6 +404,25 @@ class Shop extends \Eccube\Entity\AbstractEntity
      * @ORM\Column(name="update_date", type="datetime", nullable=true)
      */
     private $updateDate;
+
+
+    private $pref;
+
+	/**
+	 * @return Pref
+	 */
+	public function getPref(): Pref
+	{
+		return $this->pref;
+	}
+
+	/**
+	 * @param Pref $pref
+	 */
+	public function setPref(Pref $pref): void
+	{
+		$this->pref = $pref;
+	}
 
 	/**
 	 * @return int
@@ -1239,6 +1260,25 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public static function generateRandomString($length = 10) {
 		return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
 	}
+
+	public function getIndustryTypeName() {
+		$choices = [
+			"ヘアサロン" => 1,
+			"ネイル・まつげサロン" => 2,
+			"リラクスサロン" => 3,
+			"エステサロン" => 4,
+			"その他" => 5,
+		];
+
+		foreach ($choices as $key=>$value) {
+			if($value == $this->getIndustryType()) {
+				return $key;
+			}
+		}
+
+		return null;
+	}
+
 
 
 

@@ -107,6 +107,9 @@ parameters:
     eccube_forgot_mail_template_id: 6 #パスワードリセット
     eccube_reset_complete_mail_template_id: 7 #パスワードリマインダー
     eccube_shipping_notify_mail_template_id: 8 #出荷通知メール
+    eccube_shop_entry_confirm_mail_template_id: 9 #掲載店登録受付メール
+    eccube_shop_entry_complete_mail_template_id: 10 #掲載店登録完了メール
+    eccube_shop_entry_confirm_to_admin_mail_template_id: 11 #掲載店承認メール(管理員向け)
     # メールアドレスをRFC準拠でチェックするか true: チェックする、false: チェックしない
     eccube_rfc_email_check: false
     eccube_package_api_url: '%env(ECCUBE_PACKAGE_API_URL)%'
