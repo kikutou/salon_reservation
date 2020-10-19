@@ -6,16 +6,19 @@ use Customize\Entity\Shop;
 use Customize\Form\Type\Front\ShopEntryType;
 use Customize\Repository\ShopRepository;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\Master\Pref;
 use Eccube\Entity\Member;
 use Eccube\Repository\Master\AuthorityRepository;
 use Eccube\Repository\Master\WorkRepository;
 use Eccube\Repository\MemberRepository;
+use Eccube\Service\MailService;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ShopController extends AbstractController
 {
@@ -34,19 +37,23 @@ class ShopController extends AbstractController
 	protected $workRepository;
 	protected $memberRepository;
 
+	protected $shopMailService;
+
 
 	public function __construct(
 		ShopRepository $shopRepository,
 		EncoderFactoryInterface $encoderFactory,
 		AuthorityRepository $authorityRepository,
 		WorkRepository $workRepository,
-		MemberRepository $memberRepository
+		MemberRepository $memberRepository,
+		MailService $shopMailService
 	) {
 		$this->shopRepository = $shopRepository;
 		$this->encoderFactory = $encoderFactory;
 		$this->authorityRepository = $authorityRepository;
 		$this->workRepository = $workRepository;
 		$this->memberRepository = $memberRepository;
+		$this->shopMailService = $shopMailService;
 	}
 
 	/**
@@ -113,6 +120,14 @@ class ShopController extends AbstractController
 				$em->persist($shop);
 				$em->flush($shop);
 
+				$this->shopMailService->sendShopConfirmMail($shop);
+
+				$shop->setPref($this->getDoctrine()->getManager()->getRepository(Pref::class)->find($shop->getMtbPrefId()));
+				$this->shopMailService->sendShopConfirmMailToAdmin(
+					$shop,
+					$this->generateUrl('shop_entry_confirm', array('id' => $shop->getId(), "token" => $shop->getToken()), UrlGeneratorInterface::ABSOLUTE_URL)
+				);
+
 				return $this->render("Shop/complete.twig", []);
 
 			}
@@ -124,6 +139,38 @@ class ShopController extends AbstractController
 		return [
 			"form" => $form->createView()
 		];
+	}
+
+	/**
+	 * @param Request $request
+	 * @Route("/shop/entry/complete/{id}/{token}", name="shop_entry_confirm")
+	 * @Template("Shop/entry_complete.twig")
+	 */
+	public function entry_complete(Request $request, Shop $shop,string $token = null)
+	{
+
+		if($shop->getToken() == $token) {
+
+			if($shop->getAuthenticatedByAdmin() != 2) {
+				$shop->setAuthenticatedByAdmin(2);
+
+				$Work = $this->entityManager->find(\Eccube\Entity\Master\Work::class, 1);
+				$member = $this->memberRepository->find($shop->getMemberId())->setWork($Work);
+
+				$manager = $this->getDoctrine()->getManager();
+				$manager->flush();
+
+				$loginUrl = $this->generateUrl("admin_login",[],UrlGeneratorInterface::ABSOLUTE_URL);
+
+				$this->shopMailService->sendShopEntryCompleteMail($shop, $loginUrl);
+
+				return [];
+			}
+
+		}
+
+		return $this->render("Shop/entry_fail.twig", []);
+
 	}
 
 

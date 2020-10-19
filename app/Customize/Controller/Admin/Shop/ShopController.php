@@ -20,6 +20,7 @@ use Doctrine\ORM\QueryBuilder;
 use Eccube\Common\Constant;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\Master\CsvType;
+use Eccube\Entity\Member;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Admin\SearchCustomerType;
@@ -154,6 +155,10 @@ class ShopController extends AbstractController
 
         /** @var QueryBuilder $qb */
         $qb = $this->shopRepository->getQueryBuilderBySearchData($searchData);
+
+        if(($this->getUser()->getAuthority()->getId() == 2)) {
+        	$qb->andWhere("c.memberId = :member_id")->setParameter("member_id", $this->getUser()->getId());
+        }
 
 
         $pagination = $paginator->paginate(

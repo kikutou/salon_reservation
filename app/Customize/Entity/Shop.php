@@ -3,6 +3,9 @@
 namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Eccube\Entity\Master\Pref;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Shop
@@ -189,9 +192,9 @@ class Shop extends \Eccube\Entity\AbstractEntity
     /**
      * @var string|null
      *
-     * @ORM\Column(name="creadit_cards_info", type="text", length=65535, nullable=true)
+     * @ORM\Column(name="credit_cards_info", type="text", length=65535, nullable=true)
      */
-    private $creaditCardsInfo;
+    private $creditCardsInfo;
 
     /**
      * @var string|null
@@ -402,6 +405,25 @@ class Shop extends \Eccube\Entity\AbstractEntity
      * @ORM\Column(name="update_date", type="datetime", nullable=true)
      */
     private $updateDate;
+
+
+    private $pref;
+
+	/**
+	 * @return Pref
+	 */
+	public function getPref(): Pref
+	{
+		return $this->pref;
+	}
+
+	/**
+	 * @param Pref $pref
+	 */
+	public function setPref(Pref $pref): void
+	{
+		$this->pref = $pref;
+	}
 
 	/**
 	 * @return int
@@ -651,6 +673,20 @@ class Shop extends \Eccube\Entity\AbstractEntity
 		return $this->logo;
 	}
 
+
+	/**
+	 * @return null|string
+	 */
+	public function getLogoImage(): ?string
+	{
+		return $this->logo;
+	}
+
+	public function setLogoImage(?string $logo): void
+	{
+		$this->logo = $logo;
+	}
+
 	/**
 	 * @param null|string $logo
 	 */
@@ -742,17 +778,17 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return null|string
 	 */
-	public function getCreaditCardsInfo(): ?string
+	public function getCreditCardsInfo(): ?string
 	{
-		return $this->creaditCardsInfo;
+		return $this->creditCardsInfo;
 	}
 
 	/**
-	 * @param null|string $creaditCardsInfo
+	 * @param null|string $creditCardsInfo
 	 */
-	public function setCreaditCardsInfo(?string $creaditCardsInfo): void
+	public function setCreditCardsInfo(?string $creditCardsInfo): void
 	{
-		$this->creaditCardsInfo = $creaditCardsInfo;
+		$this->creditCardsInfo = $creditCardsInfo;
 	}
 
 	/**
@@ -1239,6 +1275,25 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public static function generateRandomString($length = 10) {
 		return substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length/strlen($x)) )),1,$length);
 	}
+
+	public function getIndustryTypeName() {
+		$choices = [
+			"ヘアサロン" => 1,
+			"ネイル・まつげサロン" => 2,
+			"リラクスサロン" => 3,
+			"エステサロン" => 4,
+			"その他" => 5,
+		];
+
+		foreach ($choices as $key=>$value) {
+			if($value == $this->getIndustryType()) {
+				return $key;
+			}
+		}
+
+		return null;
+	}
+
 
 
 
