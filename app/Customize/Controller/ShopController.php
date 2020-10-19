@@ -5,13 +5,13 @@ namespace Customize\Controller;
 use Customize\Entity\Shop;
 use Customize\Form\Type\Front\ShopEntryType;
 use Customize\Repository\ShopRepository;
-use Customize\Service\ShopMailService;
 use Eccube\Controller\AbstractController;
 use Eccube\Entity\Master\Pref;
 use Eccube\Entity\Member;
 use Eccube\Repository\Master\AuthorityRepository;
 use Eccube\Repository\Master\WorkRepository;
 use Eccube\Repository\MemberRepository;
+use Eccube\Service\MailService;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -46,7 +46,7 @@ class ShopController extends AbstractController
 		AuthorityRepository $authorityRepository,
 		WorkRepository $workRepository,
 		MemberRepository $memberRepository,
-		ShopMailService $shopMailService
+		MailService $shopMailService
 	) {
 		$this->shopRepository = $shopRepository;
 		$this->encoderFactory = $encoderFactory;

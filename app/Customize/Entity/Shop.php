@@ -5,6 +5,7 @@ namespace Customize\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\Master\Pref;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Shop
@@ -191,9 +192,9 @@ class Shop extends \Eccube\Entity\AbstractEntity
     /**
      * @var string|null
      *
-     * @ORM\Column(name="creadit_cards_info", type="text", length=65535, nullable=true)
+     * @ORM\Column(name="credit_cards_info", type="text", length=65535, nullable=true)
      */
-    private $creaditCardsInfo;
+    private $creditCardsInfo;
 
     /**
      * @var string|null
@@ -672,6 +673,20 @@ class Shop extends \Eccube\Entity\AbstractEntity
 		return $this->logo;
 	}
 
+
+	/**
+	 * @return null|string
+	 */
+	public function getLogoImage(): ?string
+	{
+		return $this->logo;
+	}
+
+	public function setLogoImage(?string $logo): void
+	{
+		$this->logo = $logo;
+	}
+
 	/**
 	 * @param null|string $logo
 	 */
@@ -763,17 +778,17 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return null|string
 	 */
-	public function getCreaditCardsInfo(): ?string
+	public function getCreditCardsInfo(): ?string
 	{
-		return $this->creaditCardsInfo;
+		return $this->creditCardsInfo;
 	}
 
 	/**
-	 * @param null|string $creaditCardsInfo
+	 * @param null|string $creditCardsInfo
 	 */
-	public function setCreaditCardsInfo(?string $creaditCardsInfo): void
+	public function setCreditCardsInfo(?string $creditCardsInfo): void
 	{
-		$this->creaditCardsInfo = $creaditCardsInfo;
+		$this->creditCardsInfo = $creditCardsInfo;
 	}
 
 	/**
