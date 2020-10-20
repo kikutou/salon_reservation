@@ -1,9 +1,22 @@
 {#field_name, add_images, delete_images, images#}
+<style>
+    #thumb-{{ field_name }} div {
+        float: left;
+        margin: 4px
+    }
+
+    .ui-state-highlight {
+        height: 70px;
+        width: 70px;
+        border: dashed 1px #ccc;
+        background: #fff;
+    }
+</style>
 
 <script>
     $(function() {
         // Todo: fix drag&drop style
-        $("#thumb-{{ field_name }}").sortable({
+        $("#thumb").sortable({
             cursor: 'move',
             opacity: 0.7,
             placeholder: 'ui-state-highlight',
@@ -11,109 +24,97 @@
                 updateSortNo();
             }
         });
-
-
-
-        var proto_img_{{ field_name }} = '<div class="c-form__fileUploadThumbnail" style="background-image:url(\'__path__\');">' +
-            '<a class="delete-image-{{ field_name }} delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>' +
+        var proto_img = '<div class="c-form__fileUploadThumbnail" style="background-image:url(\'__path__\');">' +
+            '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>' +
             '</div>';
-        var proto_add_{{ field_name }} = '{{ form_widget(add_images.vars.prototype) }}';
-        var proto_del_{{ field_name }} = '{{ form_widget(delete_images.vars.prototype) }}';
-
-        {% with %}
-        {% set images = [images] %}
-        {% for image in images %}
-        var $img_{{ field_name }} = $(proto_img_{{ field_name }}.replace(/__path__/g, '{{ asset(image.vars.value, 'save_image') }}'));
-        var $widget_{{ field_name }} = $('{{ form_widget(image) }}');
-        $widget_{{ field_name }}.val('{{ image.vars.value }}');
-        $("#thumb-{{ field_name }}").append($img_{{ field_name }}.append($widget_{{ field_name }}));
+        var proto_add = '{{ form_widget(form.logo_add_images.vars.prototype) }}';
+        var proto_del = '{{ form_widget(form.logo_delete_images.vars.prototype) }}';
+        {% for image in form.images %}
+        var $img = $(proto_img.replace(/__path__/g, '{{ asset(image.vars.value, 'save_image') }}'));
+        var $widget = $('{{ form_widget(image) }}');
+        $widget.val('{{ image.vars.value }}');
+        $("#thumb").append($img.append($widget));
         {% endfor %}
-        {% endwith %}
-
-        {% for add_image in add_images %}
-        var $img_{{ field_name }} = $(proto_img_{{ field_name }}.replace(/__path__/g, '{{ asset(add_image.vars.value, 'temp_image') }}'));
-        var $widget_{{ field_name }} = $('{{ form_widget(add_image) }}');
-        $widget_{{ field_name }}.val('{{ add_image.vars.value }}');
-        $("#thumb-{{ field_name }}").append($img_{{ field_name }}.append($widget_{{ field_name }}));
+        {% for add_image in form.logo_add_images %}
+        var $img = $(proto_img.replace(/__path__/g, '{{ asset(add_image.vars.value, 'temp_image') }}'));
+        var $widget = $('{{ form_widget(add_image) }}');
+        $widget.val('{{ add_image.vars.value }}');
+        $("#thumb").append($img.append($widget));
         {% endfor %}
-
-        {% for delete_image in delete_images %}
-        $("#thumb-{{ field_name }}").append('{{ form_widget(delete_image) }}');
+        {% for delete_image in form.logo_delete_images %}
+        $("#thumb").append('{{ form_widget(delete_image) }}');
         {% endfor %}
-        var hideThumbnail_{{ field_name }} = function() {
-            if ($("#thumb-{{ field_name }} div").length > 0) {
-                $("#icon_no_image-{{ field_name }}").css("display", "none");
-                $('#message-{{ field_name }}').html("{{ 'admin.common.drag_and_drop_description'|trans }}");
+        var hideThumbnail = function() {
+            if ($("#thumb div").length > 0) {
+                $("#icon_no_image").css("display", "none");
+                $('#message').html("{{ 'admin.common.drag_and_drop_description'|trans }}");
             } else {
-                $("#icon_no_image-{{ field_name }}").css("display", "");
-                $('#message-{{ field_name }}').empty();
+                $("#icon_no_image").css("display", "");
+                $('#message').empty();
             }
         };
-
         // Todo: fix update sort by drag&drop
-        var updateSortNo_{{ field_name }} = function() {
-            $("#thumb-{{ field_name }} div").each(function(index) {
-                $(this).find(".sort_no_images-{{ field_name }}").remove();
+        var updateSortNo = function() {
+            $("#thumb div").each(function(index) {
+                $(this).find(".sort_no_images").remove();
                 filename = $(this).find("input[type='hidden']").val();
-                $sortNo = $('<input type="hidden" class="sort_no_images-{{ field_name }}" name="sort_no_images_{{ field_name }}[]" />');
+                $sortNo = $('<input type="hidden" class="sort_no_images" name="sort_no_images[]" />');
                 $sortNo.val(filename + '//' + parseInt(index + 1));
                 $(this).append($sortNo);
             });
         };
-        hideThumbnail_{{ field_name }}();
-        updateSortNo_{{ field_name }}();
+        hideThumbnail();
+        updateSortNo();
         // Delete of images
         var count_del = 0;
-        $("#thumb-{{ field_name }}").on("click", '.delete-image-{{ field_name }}', function() {
-            var $new_delete_image = $(proto_del_{{ field_name }}.replace(/__name__/g, count_del));
+        $("#thumb").on("click", '.delete-image', function() {
+            var $new_delete_image = $(proto_del.replace(/__name__/g, count_del));
             var thumbnail = $(this).parents('div.c-form__fileUploadThumbnail');
             var src = $(thumbnail).find('input').val();
             $new_delete_image.val(src);
-            $("#thumb-{{ field_name }}").append($new_delete_image);
+            $("#thumb").append($new_delete_image);
             $(thumbnail).remove();
-            hideThumbnail_{{ field_name }}();
-            updateSortNo_{{ field_name }}();
+            hideThumbnail();
+            updateSortNo();
             count_del++;
         });
-
-        var count_add_{{ field_name }} = {{ add_images|length|default(0) }};
-        $('#{{ images.vars.id }}').fileupload({
+        var count_add = {{ form.logo_add_images|length|default(0) }};
+        $('#{{ form.logo.vars.id }}').fileupload({
             url: "{{ image_url }}",
             type: "post",
             sequentialUploads: true,
             dataType: 'json',
-            dropZone: $('#upload-zone-{{ field_name }}'),
+            dropZone: $('#upload-zone'),
             done: function(e, data) {
-                $('.progress-{{ field_name }}').hide();
+                $('.progress').hide();
                 $.each(data.result.files, function(index, file) {
                     var path = '{{ asset('', 'temp_image') }}' + file;
-                    var $img = $(proto_img_{{ field_name }}.replace(/__path__/g, path));
-                    var $new_img = $(proto_add_{{ field_name }}.replace(/__name__/g, count_add_{{ field_name }}));
+                    var $img = $(proto_img.replace(/__path__/g, path));
+                    var $new_img = $(proto_add.replace(/__name__/g, count_add));
                     $new_img.val(file);
                     $child = $img.append($new_img);
-                    $('#thumb-{{ field_name }}').empty();
-                    $('#thumb-{{ field_name }}').append($child);
-                    count_add_{{ field_name }}++;
+                    $('#thumb').append($child);
+                    count_add++;
                 });
-                hideThumbnail_{{ field_name }}();
-                updateSortNo_{{ field_name }}();
+                hideThumbnail();
+                updateSortNo();
             },
             fail: function(e, data) {
                 alert("{{ 'admin.common.upload_error'|trans }}");
             },
             always: function(e, data) {
-                $('.progress-{{ field_name }}').hide();
-                $('.progress-{{ field_name }} .progress-bar-{{ field_name }}').width('0%');
+                $('.progress').hide();
+                $('.progress .progress-bar').width('0%');
             },
             start: function(e, data) {
-                $('.progress-{{ field_name }}').show();
+                $('.progress').show();
             },
             acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
             maxFileSize: 10000000,
             maxNumberOfFiles: 10,
             progressall: function(e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
-                $('.progress-{{ field_name }} .progress-bar-{{ field_name }}').css(
+                $('.progress .progress-bar').css(
                     'width',
                     progress + '%'
                 );
@@ -125,36 +126,33 @@
             }
         });
         // 画像アップロード
-        $('#file_upload-{{ field_name }}').on('click', function() {
-            $('#{{ images.vars.id }}').click();
+        $('#file_upload').on('click', function() {
+            $('#{{ form.logo.vars.id }}').click();
         });
-
-
-
-
     });
 </script>
+
 <div class="row">
     <div class="col-3">
-        <div class="d-inline-block" data-tooltip="true" data-placement="top" title="ロゴ">
+        <div class="d-inline-block" data-tooltip="true" data-placement="top" title="{{ 'tooltip.product.image'|trans }}">
             <span>ロゴ</span>
             <i class="fa fa-question-circle fa-lg ml-1"></i>
             <br>{{ 'admin.product.image_size'|trans }}
         </div>
     </div>
     <div class="col mb-2">
-        <div class="progress-{{ field_name }}" style="display: none;">
-            <div class="progress-bar-{{ field_name }} progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress" style="display: none;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-        <div id="thumb-{{ field_name }}" class="c-form__fileUploadThumbnails clearfix"></div>
-        <p id="message-{{ field_name }}"></p>
-        <div id="upload-zone-{{ field_name }}" class="media py-5 border-ec-dashed mb-2 rounded">
+        <div id="thumb" class="c-form__fileUploadThumbnails clearfix"></div>
+        <p id="message"></p>
+        <div id="upload-zone" class="media py-5 border-ec-dashed mb-2 rounded">
             <div class="media-body">
                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                 {{ 'admin.common.drag_and_drop_image_description'|trans }}
-                {{ form_widget(images, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
-                {{ form_errors(images) }}
-                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_{{ field_name }}').click()">
+                {{ form_widget(form.logo, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
+                {{ form_errors(form.logo) }}
+                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_logo').click()">
                     {{ 'admin.common.file_select'|trans }}
                 </a>
             </div><!-- /.media-body -->
