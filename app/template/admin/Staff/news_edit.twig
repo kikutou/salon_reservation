@@ -58,7 +58,7 @@ file that was distributed with this source code.
                 var reader = new FileReader();
                 reader.onload = function() {
                     var img_src = '<div style="position:relative">' 
-                    + '<img src=' + reader.result + ' width="400" height="400">'
+                    + '<img src=' + reader.result + ' width="400" height="100%">'
                     + '<div class="divx delete_img">'
                     + '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a></div></div>';
                     $(imgName).html(img_src);
@@ -139,7 +139,7 @@ file that was distributed with this source code.
                                         <span id="image">
                                         {% if app.request.get('id') and Staff.image is not null %}
                                             <div style="position:relative">
-                                                <img src="{{ asset(Staff.image|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <img src="{{ asset(Staff.image|no_image_product, 'save_image') }}" width="400" height="100%">
                                                 <div class="divx delete_origin_img" data-img="image">
                                                     <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
                                                 </div>
@@ -278,7 +278,7 @@ file that was distributed with this source code.
                                         <span id="image1">
                                         {% if app.request.get('id') and Staff.image1 is not null %}
                                             <div style="position:relative">
-                                                <img src="{{ asset(Staff.image1|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <img src="{{ asset(Staff.image1|no_image_product, 'save_image') }}" width="400" height="100%">
                                                 <div class="divx delete_origin_img" data-img="image1">
                                                     <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
                                                 </div>
@@ -325,7 +325,7 @@ file that was distributed with this source code.
                                         <span id="image2">
                                         {% if app.request.get('id') and Staff.image2 is not null %}
                                             <div style="position:relative">
-                                                <img src="{{ asset(Staff.image2|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <img src="{{ asset(Staff.image2|no_image_product, 'save_image') }}" width="400" height="100%">
                                                 <div class="divx delete_origin_img" data-img="image2">
                                                     <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
                                                 </div>
@@ -372,7 +372,7 @@ file that was distributed with this source code.
                                         <span id="image3">
                                         {% if app.request.get('id') and Staff.image3 is not null %}
                                             <div style="position:relative">
-                                                <img src="{{ asset(Staff.image3|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <img src="{{ asset(Staff.image3|no_image_product, 'save_image') }}" width="400" height="100%">
                                                 <div class="divx delete_origin_img" data-img="image3">
                                                     <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
                                                 </div>
@@ -419,7 +419,7 @@ file that was distributed with this source code.
                                         <span id="image4">
                                         {% if app.request.get('id') and Staff.image4 is not null %}
                                             <div style="position:relative">
-                                                <img src="{{ asset(Staff.image4|no_image_product, 'save_image') }}" width="400" height="400">
+                                                <img src="{{ asset(Staff.image4|no_image_product, 'save_image') }}" width="400" height="100%">
                                                 <div class="divx delete_origin_img" data-img="image4">
                                                     <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
                                                 </div>

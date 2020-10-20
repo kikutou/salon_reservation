@@ -114,7 +114,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('introduction', TextType::class, [
+            ->add('introduction', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -122,7 +122,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('experience', TextType::class, [
+            ->add('experience', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -130,7 +130,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('style', TextType::class, [
+            ->add('style', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -138,7 +138,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('skills', TextType::class, [
+            ->add('skills', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -146,7 +146,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('hobbies', TextType::class, [
+            ->add('hobbies', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -198,7 +198,7 @@ class StaffType extends AbstractType
 	            ]
 				
 			])
-			->add('comment1', TextType::class, [
+			->add('comment1', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -206,7 +206,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
 			])
-			->add('comment2', TextType::class, [
+			->add('comment2', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -214,7 +214,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
 			])
-			->add('comment3', TextType::class, [
+			->add('comment3', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
@@ -222,7 +222,7 @@ class StaffType extends AbstractType
                     ]),
                 ],
 			])
-			->add('comment4', TextType::class, [
+			->add('comment4', TextareaType::class, [
 				'required' => false,
 				'constraints' => [
                     new Assert\Length([
