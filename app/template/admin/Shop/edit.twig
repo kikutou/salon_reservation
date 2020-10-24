@@ -18,6 +18,25 @@ file that was distributed with this source code.
 
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 
+{% block stylesheet %}
+    <style>
+        .delete-image {
+            margin-left: 5px;
+        }
+        .divx {
+            cursor: pointer;
+            background-color: #FFFFFF;
+            opacity:0.5;
+            width: 20px;
+            height: 20px;
+            position:absolute;
+            top:0;
+            left:150px;
+        }
+        
+    </style>
+{% endblock stylesheet %}
+
 {% block javascript %}
 
     <script src="{{ asset('assets/js/vendor/fileupload/vendor/jquery.ui.widget.js', 'admin') }}"></script>
@@ -57,6 +76,48 @@ file that was distributed with this source code.
             confirmFormChange($('#form1'), $('a[data-action="confirm"]'), $('#confirmFormChangeModal'))
         });
 
+        var delete_images = []
+        // アップロードするファイルを選択
+        $('input[type=file]').each(function(index, ele){
+            $(this).change(function() {
+                var imgName = '#' + $(this).attr('data-img');
+                var file = $(this).prop('files')[0];
+
+                // 画像以外は処理を停止
+                if (! file.type.match('image.*')) {
+                    // クリア
+                    $(this).val('');
+                    $(imgName).html('');
+                    return;
+                }
+
+                // 画像表示
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var img_src = '<div style="position:relative">' 
+                    + '<img src=' + reader.result + ' width="170px" height="170px">'
+                    + '<div class="divx delete_img">'
+                    + '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a></div></div>';
+                    $(imgName).html(img_src);
+                }
+                reader.readAsDataURL(file);
+                // 画像削除
+                $(imgName).on('click','.delete_img', function(){
+                    $(this).parent().remove();
+                    var tagName = '#admin_shop_' + imgName.slice(1);
+                    $(tagName).val('');
+                });
+            });
+        });
+
+        // 元画像削除
+        $('.delete_origin_img').click(function(){
+            $(this).parent().remove();
+            var eleName = $(this).attr('data-img');
+            delete_images.push(eleName);
+            $('[name="image_delete_flg"]').val(delete_images.join(','));
+        });
+
     </script>
 
 {% endblock javascript %}
@@ -64,7 +125,8 @@ file that was distributed with this source code.
 {% block main %}
     <form name="customer_form" role="form" id="customer_form" method="post" class="h-adr"
           action="{{ url('admin_shop_edit', { id : Shop.id }) }}"
-          novalidate>
+          novalidate enctype="multipart/form-data">
+        <input type="hidden" name="image_delete_flg" value="">
         <span class="p-country-name" style="display:none;">Japan</span>
         {{ form_widget(form._token) }}
         <div class="c-contentsArea__cols">
@@ -287,6 +349,24 @@ file that was distributed with this source code.
                                     </div>
                                 </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>質問</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.question) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.question) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -295,7 +375,7 @@ file that was distributed with this source code.
                     <div class="card rounded border-0 mb-4">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col-8"><span class="card-title">掲載点詳細情報</span>
+                                <div class="col-8"><span class="card-title">掲載店詳細情報</span>
                                 </div>
                                 <div class="col-4 text-right">
                                     <a data-toggle="collapse" href="#ordererInfo"
@@ -305,20 +385,68 @@ file that was distributed with this source code.
                                 </div>
                             </div>
                         </div>
+
                         <div class="collapse show ec-cardCollapse" id="ordererInfo">
                             <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>ロゴ</span>
+                                        <i class="fa fa-question-circle fa-lg ml-1"></i>
+                                        <br>{{ 'admin.product.image_size'|trans }}
+                                    </div>
+                                    <div class="col">
+                                        <div id="logo">
+                                        {% if Shop.logo is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.logo|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="logo">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.logo, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'logo' }}) }}
+                                                {{ form_errors(form.logo) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_logo').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {%
                                     include
-                                        "Subview/one_image_upload.twig" with
+                                        "Subview/multiple_image_upload.twig" with
                                         {
-                                            "field_name": "logo",
+                                            "field_name": "top_images",
                                             "form": form,
-                                            "image_url": url("admin_shop_image_add", {"field_name": "logo"})
+                                            "image_url": url("admin_shop_image_add", {"field_name": "top_images"})
                                         }
-
                                 %}
+                                
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>タグ</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.tags) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.tags) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="row mb-2">
                                     <div class="col-3">
@@ -333,6 +461,24 @@ file that was distributed with this source code.
                                         <div class="row">
                                             <div class="col">
                                                 {{ form_errors(form.access) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>営業時間</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.business_hours) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.business_hours) }}
                                             </div>
                                         </div>
                                     </div>
@@ -451,371 +597,496 @@ file that was distributed with this source code.
                                     </div>
                                 </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>こだわりタイトル1</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.commitment_title_1) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.commitment_title_1) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>こだわり写真1</span>
+                                    </div>
+                                    <div class="col">
+                                        <span id="commitmentImage1">
+                                        {% if Shop.commitmentImage1 is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.commitmentImage1|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="commitmentImage1">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </span>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.commitmentImage1, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'commitmentImage1' }}) }}
+                                                {{ form_errors(form.commitmentImage1) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_commitmentImage1').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>こだわり説明1</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.commitment_introduction_1) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.commitment_introduction_1) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>こだわりタイトル2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.commitment_title_2) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.commitment_title_2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>こだわり写真2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div id="commitmentImage2">
+                                        {% if Shop.commitmentImage2 is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.commitmentImage2|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="commitmentImage2">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.commitmentImage2, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'commitmentImage2' }}) }}
+                                                {{ form_errors(form.commitmentImage2) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_commitmentImage2').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>こだわり説明2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.commitment_introduction_2) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.commitment_introduction_2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                {#<script>#}
-                                    {#$(function() {#}
-                                        {#// Todo: fix drag&drop style#}
-                                        {#$("#thumb").sortable({#}
-                                            {#cursor: 'move',#}
-                                            {#opacity: 0.7,#}
-                                            {#placeholder: 'ui-state-highlight',#}
-                                            {#update: function(event, ui) {#}
-                                                {#updateSortNo();#}
-                                            {#}#}
-                                        {#});#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気タイトル1</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.environment_title_1) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.environment_title_1) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気写真1</span>
+                                    </div>
+                                    <div class="col">
+                                        <div id="environmentImage1">
+                                        {% if Shop.environmentImage1 is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.environmentImage1|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="environmentImage1">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.environmentImage1, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'environmentImage1' }}) }}
+                                                {{ form_errors(form.environmentImage1) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_environmentImage1').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気説明1</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.environment_introduction_1) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.environment_introduction_1) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#var proto_img = '<div class="c-form__fileUploadThumbnail" style="background-image:url(\'__path__\');">' +#}
-                                            {#'<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>' +#}
-                                            {#'</div>';#}
-                                        {#var proto_add = '{{ form_widget(form.add_images.vars.prototype) }}';#}
-                                        {#var proto_del = '{{ form_widget(form.delete_images.vars.prototype) }}';#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気タイトル2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.environment_title_2) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.environment_title_2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#{% for image in form.logo_image %}#}
-                                        {#var $img = $(proto_img.replace(/__path__/g, '{{ asset(image.vars.value, 'save_image') }}'));#}
-                                        {#var $widget = $('{{ form_widget(image) }}');#}
-                                        {#$widget.val('{{ image.vars.value }}');#}
-                                        {#$("#thumb").append($img.append($widget));#}
-                                        {#{% endfor %}#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気写真2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div id="environmentImage2">
+                                        {% if Shop.environmentImage2 is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.environmentImage2|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="environmentImage2">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.environmentImage2, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'environmentImage2' }}) }}
+                                                {{ form_errors(form.environmentImage2) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_environmentImage2').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#{% for add_image in form.add_images %}#}
-                                        {#var $img = $(proto_img.replace(/__path__/g, '{{ asset(add_image.vars.value, 'temp_image') }}'));#}
-                                        {#var $widget = $('{{ form_widget(add_image) }}');#}
-                                        {#$widget.val('{{ add_image.vars.value }}');#}
-                                        {#$("#thumb").append($img.append($widget));#}
-                                        {#{% endfor %}#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気説明2</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.environment_introduction_2) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.environment_introduction_2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気タイトル3</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.environment_title_3) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.environment_title_3) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#{% for delete_image in form.delete_images %}#}
-                                        {#$("#thumb").append('{{ form_widget(delete_image) }}');#}
-                                        {#{% endfor %}#}
-                                        {#var hideThumbnail = function() {#}
-                                            {#if ($("#thumb div").length > 0) {#}
-                                                {#$("#icon_no_image").css("display", "none");#}
-                                                {#$('#message').html("{{ 'admin.common.drag_and_drop_description'|trans }}");#}
-                                            {#} else {#}
-                                                {#$("#icon_no_image").css("display", "");#}
-                                                {#$('#message').empty();#}
-                                            {#}#}
-                                        {#};#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気写真3</span>
+                                    </div>
+                                    <div class="col">
+                                        <div id="environmentImage3">
+                                        {% if Shop.environmentImage3 is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.environmentImage3|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="environmentImage3">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.environmentImage3, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'environmentImage3' }}) }}
+                                                {{ form_errors(form.environmentImage3) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_environmentImage3').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#// Todo: fix update sort by drag&drop#}
-                                        {#var updateSortNo = function() {#}
-                                            {#$("#thumb div").each(function(index) {#}
-                                                {#$(this).find(".sort_no_images").remove();#}
-                                                {#filename = $(this).find("input[type='hidden']").val();#}
-                                                {#$sortNo = $('<input type="hidden" class="sort_no_images" name="sort_no_images[]" />');#}
-                                                {#$sortNo.val(filename + '//' + parseInt(index + 1));#}
-                                                {#$(this).append($sortNo);#}
-                                            {#});#}
-                                        {#};#}
-                                        {#hideThumbnail();#}
-                                        {#updateSortNo();#}
-                                        {#// Delete of images#}
-                                        {#var count_del = 0;#}
-                                        {#$("#thumb").on("click", '.delete-image', function() {#}
-                                            {#var $new_delete_image = $(proto_del.replace(/__name__/g, count_del));#}
-                                            {#var thumbnail = $(this).parents('div.c-form__fileUploadThumbnail');#}
-                                            {#var src = $(thumbnail).find('input').val();#}
-                                            {#$new_delete_image.val(src);#}
-                                            {#$("#thumb").append($new_delete_image);#}
-                                            {#$(thumbnail).remove();#}
-                                            {#hideThumbnail();#}
-                                            {#updateSortNo();#}
-                                            {#count_del++;#}
-                                        {#});#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>雰囲気説明3</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.environment_introduction_3) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.environment_introduction_3) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#var count_add = {{ form.add_images|length|default(0) }};#}
-                                        {#$('#{{ form.logo_image.vars.id }}').fileupload({#}
-                                            {#url: "{{ url('admin_shop_logo_image_add') }}",#}
-                                            {#type: "post",#}
-                                            {#sequentialUploads: true,#}
-                                            {#dataType: 'json',#}
-                                            {#dropZone: $('#upload-zone'),#}
-                                            {#done: function(e, data) {#}
-                                                {#$('.progress').hide();#}
-                                                {#$.each(data.result.files, function(index, file) {#}
-                                                    {#var path = '{{ asset('', 'temp_image') }}' + file;#}
-                                                    {#var $img = $(proto_img.replace(/__path__/g, path));#}
-                                                    {#var $new_img = $(proto_add.replace(/__name__/g, count_add));#}
-                                                    {#$new_img.val(file);#}
-                                                    {#$child = $img.append($new_img);#}
-                                                    {#$('#thumb').empty();#}
-                                                    {#$('#thumb').append($child);#}
-                                                    {#count_add++;#}
-                                                {#});#}
-                                                {#hideThumbnail();#}
-                                                {#updateSortNo();#}
-                                            {#},#}
-                                            {#fail: function(e, data) {#}
-                                                {#alert("{{ 'admin.common.upload_error'|trans }}");#}
-                                            {#},#}
-                                            {#always: function(e, data) {#}
-                                                {#$('.progress').hide();#}
-                                                {#$('.progress .progress-bar').width('0%');#}
-                                            {#},#}
-                                            {#start: function(e, data) {#}
-                                                {#$('.progress').show();#}
-                                            {#},#}
-                                            {#acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,#}
-                                            {#maxFileSize: 10000000,#}
-                                            {#maxNumberOfFiles: 10,#}
-                                            {#progressall: function(e, data) {#}
-                                                {#var progress = parseInt(data.loaded / data.total * 100, 10);#}
-                                                {#$('.progress .progress-bar').css(#}
-                                                    {#'width',#}
-                                                    {#progress + '%'#}
-                                                {#);#}
-                                            {#},#}
-                                            {#processalways: function(e, data) {#}
-                                                {#if (data.files.error) {#}
-                                                    {#alert("{{ 'admin.common.upload_error'|trans }}");#}
-                                                {#}#}
-                                            {#}#}
-                                        {#});#}
-                                        {#// 画像アップロード#}
-                                        {#$('#file_upload').on('click', function() {#}
-                                            {#$('#{{ form.logo_image.vars.id }}').click();#}
-                                        {#});#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>一言</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.message) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.message) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>一言担当職</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.message_staff_position) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.message_staff_position) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>一言担当</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.message_staff) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.message_staff) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {#var confirmFormChange = function(form, target, modal) {#}
-                                            {#var returnLink = form.find('input[type="hidden"][name*="return_link"]'),#}
-                                                {#saveBtn = modal.find('a[data-action="save"]'),#}
-                                                {#cancelBtn = modal.find('a[data-action="cancel"]');#}
-                                            {#modal.on('hidden.bs.modal', function() {#}
-                                                {#returnLink.val('');#}
-                                            {#});#}
-                                            {#saveBtn.on('click', function() {#}
-                                                {#returnLink.val($(this).data('return-link'));#}
-                                                {#$(this).addClass('disabled');#}
-                                                {#form.submit();#}
-                                            {#});#}
-                                            {#target.on('click', function() {#}
-                                                {#modal.find('.modal-body .screen-name').text($(this).attr('title'));#}
-                                                {#modal.modal('show');#}
-                                                {#saveBtn.data('return-link', $(this).attr('href'));#}
-                                                {#cancelBtn.attr('href', $(this).attr('href'));#}
-                                                {#return false;#}
-                                            {#});#}
-                                        {#};#}
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>一言写真</span>
+                                    </div>
+                                    <div class="col">
+                                        <div id="messageImage">
+                                        {% if Shop.messageImage is not null %}
+                                            <div style="position:relative;">
+                                                <img src="{{ asset(Shop.messageImage|no_image_product, 'save_image') }}" width="170px" height="170px">
+                                                <div class="divx delete_origin_img" data-img="messageImage">
+                                                    <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        </div>
+                                        <div class="media py-5 border-ec-dashed mb-2 rounded">
+                                            <div class="media-body">
+                                                <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
+                                                画像を
+                                                {{ form_widget(form.messageImage, {attr: {placeholder: 'admin.content.file.directory_name', accept : 'image/*', style : 'display:none;', 'data-img' : 'messageImage' }}) }}
+                                                {{ form_errors(form.messageImage) }}
+                                                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_messageImage').click()">
+                                                    {{ 'admin.common.file_select'|trans }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                                        {#confirmFormChange($('#form1'), $('a[data-action="confirm"]'), $('#confirmFormChangeModal'))#}
-                                    {#});#}
-                                {#</script>#}
-                                {#<div class="row">#}
-                                    {#<div class="col-3">#}
-                                        {#<div class="d-inline-block" data-tooltip="true" data-placement="top" title="ロゴ">#}
-                                            {#<span>ロゴ</span>#}
-                                            {#<i class="fa fa-question-circle fa-lg ml-1"></i>#}
-                                            {#<br>{{ 'admin.product.image_size'|trans }}#}
-                                        {#</div>#}
-                                    {#</div>#}
-                                    {#<div class="col mb-2">#}
-                                        {#<div class="progress" style="display: none;">#}
-                                            {#<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>#}
-                                        {#</div>#}
-                                        {#<div id="thumb" class="c-form__fileUploadThumbnails clearfix"></div>#}
-                                        {#<p id="message"></p>#}
-                                        {#<div id="upload-zone" class="media py-5 border-ec-dashed mb-2 rounded">#}
-                                            {#<div class="media-body">#}
-                                                {#<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>#}
-                                                {#{{ 'admin.common.drag_and_drop_image_description'|trans }}#}
-                                                {#{{ form_widget(form.logo_image, { attr : { accept : 'image/*', style : 'display:none;' } }) }}#}
-                                                {#{{ form_errors(form.logo_image) }}#}
-                                                {#<a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_logo_image').click()">#}
-                                                    {#{{ 'admin.common.file_select'|trans }}#}
-                                                {#</a>#}
-                                            {#</div><!-- /.media-body -->#}
-                                        {#</div><!-- /.media -->#}
-                                    {#</div>#}
-                                {#</div>#}
-
-
+            <div class="c-contentsArea__secondaryCol">
+                <div class="c-secondaryCol">
+                     <div class="card rounded border-0 mb-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="d-inline-block">
+                                        <span class="card-title">
+                                            開業状況
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <a data-toggle="collapse" href="#open_status" aria-expanded="false" aria-controls="open_status">
+                                        <i class="fa fa-angle-up fa-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse show ec-cardCollapse" id="open_status">
+                            <div class="card-body">
+                                <div class="col">
+                                    {{ form_widget(form.open_status) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card rounded border-0 mb-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="d-inline-block">
+                                        <span class="card-title">
+                                            認証状態
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <a data-toggle="collapse" href="#authenticated_by_admin" aria-expanded="false" aria-controls="authenticated_by_admin">
+                                        <i class="fa fa-angle-up fa-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse show ec-cardCollapse" id="authenticated_by_admin">
+                            <div class="card-body">
+                                <div class="col">
+                                    {{ form_widget(form.authenticated_by_admin) }}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {#{% if Shop.id %}#}
-                        {#<div class="card rounded border-0 mb-4">#}
-                            {#<div class="card-header">#}
-                                {#<div class="row">#}
-                                    {#<div class="col-8">#}
-                                        {#<div class="d-inline-block" data-tooltip="true" data-placement="top"#}
-                                             {#title="{{ 'tooltip.customer.customer_address'|trans }}">#}
-                                        {#<span class="card-title">#}
-                                            {#{{ 'admin.customer.customer_address'|trans }}#}
-                                            {#<i class="fa fa-question-circle fa-lg ml-1"></i>#}
-                                        {#</span>#}
-                                        {#</div>#}
-                                    {#</div>#}
-                                    {#<div class="col-4 text-right">#}
-                                        {#<a data-toggle="collapse" href="#delivery" aria-expanded="false"#}
-                                           {#aria-controls="delivery">#}
-                                            {#<i class="fa fa-angle-up fa-lg"></i>#}
-                                        {#</a>#}
-                                    {#</div>#}
-                                {#</div>#}
-                            {#</div>#}
-                            {#<div class="collapse show ec-cardCollapse" id="delivery">#}
-                                {#{% if Customer.CustomerAddresses|length > 0 %}#}
-                                    {#<div class="card-body">#}
-                                        {#<table class="table table-striped table-sm">#}
-                                            {#<thead class="table-active">#}
-                                            {#<th class="align-middle pt-2 pb-2">{{ 'admin.common.name'|trans }}</th>#}
-                                            {#<th class="align-middle pt-2 pb-2">{{ 'admin.common.address'|trans }}</th>#}
-                                            {#<th class="align-middle pt-2 pb-2 pr-3">{{ 'admin.common.phone_number'|trans }}</th>#}
-                                            {#<th class="align-middle pt-2 pb-2 pr-3"></th>#}
-                                            {#</thead>#}
-                                            {#<tbody>#}
-                                            {#{% for CustomerAddress in Customer.CustomerAddresses %}#}
-                                                {#<tr>#}
-                                                    {#<td class="align-middle">#}
-                                                        {#{{ CustomerAddress.name01 }}&nbsp;{{ CustomerAddress.name02 }}#}
-                                                    {#</td>#}
-                                                    {#<td class="align-middle">#}
-                                                        {#<a href="{{ url('admin_customer_delivery_edit', { 'id': Customer.id, 'did': CustomerAddress.id }) }}">#}
-                                                            {#{{ 'admin.common.postal_symbol'|trans }}{{ CustomerAddress.postal_code }} {{ CustomerAddress.Pref }}{{ CustomerAddress.addr01 }}{{ CustomerAddress.addr02 }}#}
-                                                        {#</a>#}
-                                                    {#</td>#}
-                                                    {#<td class="align-middle">#}
-                                                        {#{{ CustomerAddress.phone_number }}#}
-                                                    {#</td>#}
-                                                    {#<td>#}
-                                                        {#<div class="text-center" data-tooltip="true" data-placement="top" title="{{ 'admin.common.delete'|trans }}">#}
-                                                            {#<a class="btn btn-ec-actionIcon" data-toggle="modal"#}
-                                                               {#data-target="#discontinuance-{{ CustomerAddress.id }}">#}
-                                                                {#<i class="fa fa-close text-secondary"#}
-                                                                   {#aria-hidden="true"></i>#}
-                                                            {#</a>#}
-                                                        {#</div>#}
-                                                        {#<div class="modal fade" id="discontinuance-{{ CustomerAddress.id }}" tabindex="-1" role="dialog" aria-labelledby="discontinuance" aria-hidden="true">#}
-                                                            {#<div class="modal-dialog" role="document">#}
-                                                                {#<div class="modal-content">#}
-                                                                    {#<div class="modal-header">#}
-                                                                        {#<h5 class="modal-title font-weight-bold">#}
-                                                                            {#{{ 'admin.common.delete_modal__title'|trans }}</h5>#}
-                                                                        {#<button class="close" type="button" data-dismiss="modal" aria-label="Close">#}
-                                                                            {#<span aria-hidden="true">×</span>#}
-                                                                        {#</button>#}
-                                                                    {#</div>#}
-                                                                    {#<div class="modal-body text-left">#}
-                                                                        {#<p class="text-left">#}
-                                                                            {#{{ 'admin.common.delete_modal__message'|trans({ '%name%' : 'admin.common.postal_symbol'|trans ~ CustomerAddress.postal_code ~ CustomerAddress.Pref ~ ' ' ~ CustomerAddress.name01 ~ CustomerAddress.name02 }) }}</p>#}
-                                                                    {#</div>#}
-                                                                    {#<div class="modal-footer">#}
-                                                                        {#<button class="btn btn-ec-sub" type="button" data-dismiss="modal">#}
-                                                                            {#{{ 'admin.common.cancel'|trans }}#}
-                                                                        {#</button>#}
-                                                                        {#<a href="{{ url('admin_customer_delivery_delete', {'id' : Customer.id, 'did':  CustomerAddress.id}) }}" class="btn btn-ec-delete"{{ csrf_token_for_anchor() }} data-method="delete" data-confirm="false">#}
-                                                                            {#{{ 'admin.common.delete'|trans }}#}
-                                                                        {#</a>#}
-                                                                    {#</div>#}
-                                                                {#</div>#}
-                                                            {#</div>#}
-                                                        {#</div>#}
-                                                    {#</td>#}
-                                                {#</tr>#}
-                                            {#{% endfor %}#}
-                                            {#</tbody>#}
-                                        {#</table>#}
-
-                                        {# TODO: 新規追加ボタンと文言のデザインを整える #}
-                                        {#{% if Customer.CustomerAddresses|length < eccube_config.eccube_deliv_addr_max %}#}
-                                            {#<div class="d-block text-center">#}
-                                                {#<a href="{{ url('admin_customer_delivery_new', { id: Customer.id }) }}"#}
-                                                   {#class="btn btn-ec-regular">{{ 'admin.customer.customer_address__add'|trans }}</a>#}
-                                            {#</div>#}
-                                        {#{% else %}#}
-                                            {#<span class="ec-errorMessage">#}
-                                                {#{{ 'admin.customer.customer_address_count_is_over'|trans({"%eccube_deliv_addr_max%":eccube_config.eccube_deliv_addr_max}) }}#}
-                                            {#</span>#}
-                                        {#{% endif %}#}
-                                    {#</div>#}
-                                {#{% else %}#}
-                                    {#<div class="card-body">#}
-                                        {#<div id="address_box" class="data-empty">#}
-                                            {#<span>{{ 'admin.customer.no_customer_address'|trans }}</span>#}
-                                        {#</div>#}
-
-                                        {#<div class="d-block text-center">#}
-                                            {#<a href="{{ url('admin_customer_delivery_new', { id: Customer.id }) }}"#}
-                                               {#class="btn btn-ec-regular">{{ 'admin.customer.customer_address__add'|trans }}</a>#}
-                                        {#</div>#}
-
-                                    {#</div>#}
-                                {#{% endif %}#}
-                            {#</div>#}
-                        {#</div>#}
-                    {#{% endif %}#}
-
-                    {#{% if Customer.id %}#}
-                        {#<div class="card rounded border-0 mb-4">#}
-                            {#<div class="card-header">#}
-                                {#<div class="row">#}
-                                    {#<div class="col-8">#}
-                                        {#<div class="d-inline-block" data-tooltip="true" data-placement="top"#}
-                                             {#title="{{ 'tooltip.customer.purchase_history'|trans }}">#}
-                                        {#<span class="card-title">#}
-                                            {#{{ 'admin.customer.purchase_history'|trans }}#}
-                                            {#<i class="fa fa-question-circle fa-lg ml-1"></i>#}
-                                        {#</span>#}
-                                        {#</div>#}
-                                    {#</div>#}
-                                    {#<div class="col-4 text-right">#}
-                                        {#<a data-toggle="collapse" href="#orderHistory" aria-expanded="false"#}
-                                           {#aria-controls="orderHistory">#}
-                                            {#<i class="fa fa-angle-up fa-lg"></i>#}
-                                        {#</a>#}
-                                    {#</div>#}
-                                {#</div>#}
-                            {#</div>#}
-                            {#<div class="collapse show ec-cardCollapse" id="orderHistory">#}
-                                {#{% if Customer.Orders|length > 0 %}#}
-                                    {#<div class="card-body">#}
-                                        {#<table class="table table-striped table-sm">#}
-                                            {#<thead class="table-active">#}
-                                            {#<th class="align-middle pt-2 pb-2 pl-3">{{ 'admin.order.order_date'|trans }}</th>#}
-                                            {#<th class="align-middle pt-2 pb-2">{{ 'admin.order.order_no'|trans }}</th>#}
-                                            {#<th class="align-middle pt-2 pb-2">{{ 'admin.order.purchase_price'|trans }}</th>#}
-                                            {#<th class="align-middle pt-2 pb-2 pr-3">{{ 'admin.order.order_status'|trans }}</th>#}
-                                            {#</thead>#}
-                                            {#<tbody>#}
-                                            {#{% for Order in Customer.Orders %}#}
-                                                {#<tr>#}
-                                                    {#<td class="align-middle pl-3">{{ Order.order_date|date_min }}</td>#}
-                                                    {#<td class="align-middle">#}
-                                                        {#<a href="{{ url('admin_order_edit', { 'id' : Order.id }) }}">#}
-                                                            {#{{ Order.order_no }}#}
-                                                        {#</a>#}
-                                                    {#</td>#}
-                                                    {#<td class="align-middle">{{ Order.total|price }}</td>#}
-                                                    {#<td class="align-middle pr-3">#}
-                                                        {#<span class="badge badge-ec-blue" style="background-color: #fff; color: {{ Order.OrderStatusColor }}; border-color: {{ Order.OrderStatusColor }}">{{ Order.OrderStatus }}</span>#}
-                                                    {#</td>#}
-                                                {#</tr>#}
-                                            {#{% endfor %}#}
-                                            {#</tbody>#}
-                                        {#</table>#}
-                                    {#</div>#}
-                                {#{% else %}#}
-                                    {#<div class="card-body">#}
-                                        {#<div id="history_box" class="data-empty">#}
-                                        {#<span>#}
-                                            {#{{ 'admin.customer.no_purchase_history'|trans }}#}
-                                        {#</span>#}
-                                        {#</div>#}
-                                    {#</div>#}
-                                {#{% endif %}#}
-                            {#</div>#}
-                        {#</div>#}
-                    {#{% endif %}#}
+                    <div class="card rounded border-0 mb-4">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="d-inline-block">
+                                        <span class="card-title">
+                                            公開状態
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <a data-toggle="collapse" href="#public_status" aria-expanded="false" aria-controls="public_status">
+                                        <i class="fa fa-angle-up fa-lg"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse show ec-cardCollapse" id="public_status">
+                            <div class="card-body">
+                                <div class="col">
+                                    {{ form_widget(form.public_status) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>   
 
                     <div class="card rounded border-0 mb-4">
                         <div class="card-header">
@@ -837,11 +1108,11 @@ file that was distributed with this source code.
                         </div>
                         <div class="collapse show ec-cardCollapse" id="shopMemo">
                             <div class="card-body">
-                                {{ form_widget(form.memo, { 'attr': { 'row': 8 }}) }}
+                                {{ form_widget(form.memo, { attr : { rows : "8"}}) }}
                                 {{ form_errors(form.memo) }}
                             </div>
                         </div>
-                    </div>
+                    </div>  
                 </div>
             </div>
         </div>

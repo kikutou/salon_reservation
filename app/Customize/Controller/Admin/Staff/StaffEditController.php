@@ -17,16 +17,6 @@ use Customize\Entity\Staff;
 use Customize\Form\Type\Admin\StaffType;
 use Customize\Repository\StaffRepository;
 use Eccube\Controller\AbstractController;
-use Eccube\Entity\Master\CustomerStatus;
-use Eccube\Event\EccubeEvents;
-use Eccube\Event\EventArgs;
-use Eccube\Form\Type\Admin\CustomerType;
-use Eccube\Repository\CustomerRepository;
-use Eccube\Util\StringUtil;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Filesystem\Filesystem;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -109,6 +99,11 @@ class StaffEditController extends AbstractController
             if (count($images) > 0) {
                 foreach ($images as $key => $image) {
                     if (!is_null($image)) {
+                        //ファイルフォーマット検証
+                        $mimeType = $image->getMimeType();
+                        if (0 !== strpos($mimeType, 'image')) {
+                            throw new UnsupportedMediaTypeHttpException();
+                        }
                         // 拡張子
                         $extension = $image->getClientOriginalExtension();
                         if (!in_array(strtolower($extension), $allowExtensions)) {

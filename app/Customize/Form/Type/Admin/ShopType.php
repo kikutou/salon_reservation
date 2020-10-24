@@ -99,6 +99,15 @@ class ShopType extends AbstractType
                 'multiple' => false,
                 'required' => true,
             ])
+            ->add('open_status', ChoiceType::class, [
+                'choices' => [
+                    '開業済み' => 1,
+                    '開業予定' => 2,
+                ],
+                'expanded' => false,
+                'multiple' => false,
+                'required' => false,
+            ])
 
             ->add('post_code', TextType::class, [
                 'required' => true,
@@ -150,8 +159,15 @@ class ShopType extends AbstractType
             ->add('url', UrlType::class, [
                 'required' => false,
             ])
-
+            ->add('question', TextType::class, [
+                'required' => false,
+            ])
             ->add('logo', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+                'mapped' => false,
+            ])
+            ->add('top_images', FileType::class, [
                 'multiple' => false,
                 'required' => false,
                 'mapped' => false,
@@ -164,28 +180,94 @@ class ShopType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
             ])
-            ->add('logo_add_images', CollectionType::class, [
+            ->add('top_add_images', CollectionType::class, [
                 'entry_type' => HiddenType::class,
                 'prototype' => true,
                 'mapped' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
             ])
-            ->add('logo_delete_images', CollectionType::class, [
+            ->add('top_delete_images', CollectionType::class, [
                 'entry_type' => HiddenType::class,
                 'prototype' => true,
                 'mapped' => false,
                 'allow_add' => true,
                 'allow_delete' => true,
             ])
-
+            ->add('tags', TextareaType::class)
             ->add('access', TextareaType::class)
+            ->add('business_hours', TextareaType::class)
             ->add('credit_cards_info', TextareaType::class)
             ->add('price', TextareaType::class)
             ->add('seats', TextareaType::class)
             ->add('staff_number', TextareaType::class)
             ->add('parking_area', TextareaType::class)
             ->add('conditions', TextareaType::class)
+
+            ->add('authenticated_by_admin', ChoiceType::class, [
+                'choices' => [
+                    '審査中' => 1,
+                    '審査済み' => 2,
+                    '却下' => 3,
+                ],
+                'expanded' => false,
+                'multiple' => false,
+                'required' => false,
+            ])
+            ->add('public_status', ChoiceType::class, [
+                'choices' => [
+                    '非公開' => 1,
+                    '公開' => 2,
+                ],
+                'expanded' => false,
+                'multiple' => false,
+                'required' => false,
+            ])
+            ->add('commitment_title_1', TextareaType::class)
+            ->add('commitment_title_2', TextareaType::class)
+            ->add('environment_title_1', TextareaType::class)
+            ->add('environment_title_2', TextareaType::class)
+            ->add('environment_title_3', TextareaType::class)
+            ->add('commitment_introduction_1', TextareaType::class)
+            ->add('commitment_introduction_2', TextareaType::class)
+            ->add('environment_introduction_1', TextareaType::class)
+            ->add('environment_introduction_2', TextareaType::class)
+            ->add('environment_introduction_3', TextareaType::class)
+            
+            ->add('commitmentImage1', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+				'mapped' => false,
+			])
+            ->add('commitmentImage2', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+				'mapped' => false,
+            ])
+            ->add('environmentImage1', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+				'mapped' => false,
+            ])
+            ->add('environmentImage2', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+				'mapped' => false,
+            ])
+            ->add('environmentImage3', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+				'mapped' => false,
+            ])
+            
+            ->add('message', TextareaType::class)
+            ->add('message_staff_position', TextareaType::class)
+            ->add('message_staff', TextareaType::class)
+            ->add('messageImage', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+				'mapped' => false,
+            ])
 
             ->add('memo', TextareaType::class, [
                 'required' => false,

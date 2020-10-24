@@ -28,10 +28,11 @@ file that was distributed with this source code.
             background-color: #FFFFFF;
             opacity:0.5;
             width: 30px;
-            height: 20px;
+            height: 25px;
             position:absolute;
             top:0;
-            left:380px;
+            padding:5px;
+            left:370px;
         }
     </style>
 {% endblock stylesheet %}
@@ -138,7 +139,7 @@ file that was distributed with this source code.
                                     <div class="col">
                                         <span id="image">
                                         {% if app.request.get('id') and Staff.image is not null %}
-                                            <div style="position:relative">
+                                            <div style="position:relative;">
                                                 <img src="{{ asset(Staff.image|no_image_product, 'save_image') }}" width="400" height="100%">
                                                 <div class="divx delete_origin_img" data-img="image">
                                                     <a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>

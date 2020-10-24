@@ -15,14 +15,8 @@ namespace Customize\Controller\Admin\Staff;
 
 use Customize\Form\Type\Admin\SearchStaffType;
 use Customize\Repository\StaffRepository;
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\QueryBuilder;
-use Eccube\Common\Constant;
 use Eccube\Controller\AbstractController;
-use Eccube\Entity\Master\CsvType;
-use Eccube\Event\EccubeEvents;
-use Eccube\Event\EventArgs;
-use Eccube\Form\Type\Admin\SearchCustomerType;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\Master\PageMaxRepository;
 use Eccube\Repository\Master\PrefRepository;
@@ -33,11 +27,7 @@ use Eccube\Util\FormUtil;
 use Knp\Component\Pager\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class StaffController extends AbstractController
 {
