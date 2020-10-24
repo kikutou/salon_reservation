@@ -1,0 +1,107 @@
+{#field_name, add_images, delete_images, images#}
+<script>  
+    $(function() {
+        $('#thumb_top_images').sortable({
+            cursor: 'move',
+            opacity: 0.7,
+            placeholder: 'ui-state-highlight',
+            update: function(event, ui) {
+                updateSortNo();
+            }
+        });
+        var proto_img = '<div class="c-form__fileUploadThumbnail" style="background-image:url(\'__path__\');">' +
+            '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>' +
+            '</div>';
+
+        var hideThumbnail = function() {
+            if ($('#thumb_top_images div').length > 0) {
+                $("#icon_no_image").css("display", "none");
+                $('#message_top_images').html("{{ 'admin.common.drag_and_drop_description'|trans }}");
+            } else {
+                $("#icon_no_image").css("display", "");
+                $('#message_top_images').empty();
+            }
+        };
+        // Todo: fix update sort by drag&drop
+        var updateSortNo = function() {
+            $('#thumb_top_images div').each(function(index) {
+                $(this).find(".sort_no_images").remove();
+                filename = $(this).find("input[type='hidden']").val();
+                $sortNo = $('<input type="hidden" class="sort_no_images" name="sort_no_images[]" />');
+                $sortNo.val(filename + '//' + parseInt(index + 1));
+                $(this).append($sortNo);
+            });
+        };
+        hideThumbnail();
+        updateSortNo();
+        // トップイメージ
+        var proto_add = '{{ form_widget(form.top_add_images.vars.prototype) }}';
+        var proto_del = '{{ form_widget(form.top_delete_images.vars.prototype) }}';
+        {% for image in form.images %}
+        var $img = $(proto_img.replace(/__path__/g, '{{ asset(image.vars.value, 'save_image') }}'));
+        var $widget = $('{{ form_widget(image) }}');
+        $widget.val('{{ image.vars.value }}');
+        $("#thumb_top_images").append($img.append($widget));
+        {% endfor %}
+        {% for add_image in form.top_add_images %}
+        var $img = $(proto_img.replace(/__path__/g, '{{ asset(add_image.vars.value, 'temp_image') }}'));
+        var $widget = $('{{ form_widget(add_image) }}');
+        $widget.val('{{ add_image.vars.value }}');
+        $("#thumb_top_images").append($img.append($widget));
+        {% endfor %}
+        {% for delete_image in form.top_delete_images %}
+        $("#thumb_top_images").append('{{ form_widget(delete_image) }}');
+        {% endfor %}
+
+        // トップイメージ削除
+        var count_del = 0;
+        $("#thumb_top_images").on("click", '.delete-image', function() {
+            var $new_delete_image = $(proto_del.replace(/__name__/g, count_del));
+            var thumbnail = $(this).parents('div.c-form__fileUploadThumbnail');
+            var src = $(thumbnail).find('input').val();
+            $new_delete_image.val(src);
+            $("#thumb_top_images").append($new_delete_image);
+            $(thumbnail).remove();
+            hideThumbnail();
+            updateSortNo();
+            count_del++;
+        });
+        // トップイメージアップロード
+        var count_add = {{ form.top_add_images|length|default(0) }};
+        $('#{{ form.top_images.vars.id }}').fileupload({
+            url: "{{ url('admin_shop_image_add', { field_name : 'top_images' }) }}",
+            type: "post",
+            sequentialUploads: true,
+            dataType: 'json',
+            dropZone: $('#upload-zone-top_images'),
+            done: function(e, data) {
+                $.each(data.result.files, function(index, file) {
+                    var path = '{{ asset('', 'temp_image') }}' + file;
+                    var $img = $(proto_img.replace(/__path__/g, path));
+                    var $new_img = $(proto_add.replace(/__name__/g, count_add));
+                    $new_img.val(file);
+                    $child = $img.append($new_img);
+                    $('#thumb_top_images').append($child);
+                    count_add++;
+                });
+                hideThumbnail();
+                updateSortNo();
+            },
+            fail: function(e, data) {
+                alert("{{ 'admin.common.upload_error'|trans }}");
+            },
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxFileSize: 10000000,
+            maxNumberOfFiles: 10,
+            processalways: function(e, data) {
+                if (data.files.error) {
+                    alert("{{ 'admin.common.upload_error'|trans }}");
+                }
+            }
+        });
+
+    });
+</script>
+
+
+

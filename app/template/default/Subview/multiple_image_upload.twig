@@ -1,4 +1,5 @@
-{#field_name, add_images, delete_images, images#}
+{#field_name#}
+{#ファイルアップロード共通処理#}
 <style>
     #thumb-{{ field_name }} div {
         float: left;
@@ -13,130 +14,35 @@
     }
 </style>
 
-<script>
-    
-    $(function() {
-        // Todo: fix drag&drop style
-        $("#thumb").sortable({
-            cursor: 'move',
-            opacity: 0.7,
-            placeholder: 'ui-state-highlight',
-            update: function(event, ui) {
-                updateSortNo();
-            }
-        });
-        var proto_img = '<div class="c-form__fileUploadThumbnail" style="background-image:url(\'__path__\');">' +
-            '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>' +
-            '</div>';
-        var proto_add = '{{ form_widget(form.top_add_images.vars.prototype) }}';
-        var proto_del = '{{ form_widget(form.top_delete_images.vars.prototype) }}';
-        {% for image in form.images %}
-        var $img = $(proto_img.replace(/__path__/g, '{{ asset(image.vars.value, 'save_image') }}'));
-        var $widget = $('{{ form_widget(image) }}');
-        $widget.val('{{ image.vars.value }}');
-        $("#thumb").append($img.append($widget));
-        {% endfor %}
-        {% for add_image in form.top_add_images %}
-        var $img = $(proto_img.replace(/__path__/g, '{{ asset(add_image.vars.value, 'temp_image') }}'));
-        var $widget = $('{{ form_widget(add_image) }}');
-        $widget.val('{{ add_image.vars.value }}');
-        $("#thumb").append($img.append($widget));
-        {% endfor %}
-        {% for delete_image in form.top_delete_images %}
-        $("#thumb").append('{{ form_widget(delete_image) }}');
-        {% endfor %}
-        var hideThumbnail = function() {
-            if ($("#thumb div").length > 0) {
-                $("#icon_no_image").css("display", "none");
-                $('#message').html("{{ 'admin.common.drag_and_drop_description'|trans }}");
-            } else {
-                $("#icon_no_image").css("display", "");
-                $('#message').empty();
-            }
-        };
-        // Todo: fix update sort by drag&drop
-        var updateSortNo = function() {
-            $("#thumb div").each(function(index) {
-                $(this).find(".sort_no_images").remove();
-                filename = $(this).find("input[type='hidden']").val();
-                $sortNo = $('<input type="hidden" class="sort_no_images" name="sort_no_images[]" />');
-                $sortNo.val(filename + '//' + parseInt(index + 1));
-                $(this).append($sortNo);
-            });
-        };
-        hideThumbnail();
-        updateSortNo();
-        // Delete of images
-        var count_del = 0;
-        $("#thumb").on("click", '.delete-image', function() {
-            var $new_delete_image = $(proto_del.replace(/__name__/g, count_del));
-            var thumbnail = $(this).parents('div.c-form__fileUploadThumbnail');
-            var src = $(thumbnail).find('input').val();
-            $new_delete_image.val(src);
-            $("#thumb").append($new_delete_image);
-            $(thumbnail).remove();
-            hideThumbnail();
-            updateSortNo();
-            count_del++;
-        });
-        var count_add = {{ form.top_add_images|length|default(0) }};
-        $('#{{ form.top_images.vars.id }}').fileupload({
-            url: "{{ image_url }}",
-            type: "post",
-            sequentialUploads: true,
-            dataType: 'json',
-            dropZone: $('#upload-zone'),
-            done: function(e, data) {
-                $.each(data.result.files, function(index, file) {
-                    var path = '{{ asset('', 'temp_image') }}' + file;
-                    var $img = $(proto_img.replace(/__path__/g, path));
-                    var $new_img = $(proto_add.replace(/__name__/g, count_add));
-                    $new_img.val(file);
-                    $child = $img.append($new_img);
-                    $('#thumb').append($child);
-                    count_add++;
-                });
-                hideThumbnail();
-                updateSortNo();
-            },
-            fail: function(e, data) {
-                alert("{{ 'admin.common.upload_error'|trans }}");
-            },
-            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-            maxFileSize: 10000000,
-            maxNumberOfFiles: 10,
-            processalways: function(e, data) {
-                if (data.files.error) {
-                    alert("{{ 'admin.common.upload_error'|trans }}");
-                }
-            }
-        });
-        
-    });
-</script>
-
 <div class="row">
     <div class="col-3">
         <div class="d-inline-block" data-tooltip="true" data-placement="top" title="{{ 'tooltip.product.image'|trans }}">
-            <span>トップイメージ</span>
+            <span>{% if field_name == 'top_images' %}トップイメージ{% else %}店舗画像{% endif %}</span>
             <i class="fa fa-question-circle fa-lg ml-1"></i>
             <br>{{ 'admin.product.image_size'|trans }}
         </div>
     </div>
     <div class="col mb-2">
         <br/>
-        <div id="thumb" class="c-form__fileUploadThumbnails clearfix"></div>
-        <p id="message"></p>
-        <div id="upload-zone" class="media py-5 border-ec-dashed mb-2 rounded">
+        <div id="thumb_{{ field_name }}" class="c-form__fileUploadThumbnails clearfix"></div>
+        <p id="message_{{ field_name }}"></p>
+        <div id="upload-zone-{{ field_name }}" class="media py-5 border-ec-dashed mb-2 rounded">
             <div class="media-body">
                 <i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true"></i>
                 {{ 'admin.common.drag_and_drop_image_description'|trans }}
+                {% if field_name == 'top_images' %}
                     {{ form_widget(form.top_images, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
                     {{ form_errors(form.top_images) }}
-                <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_top_images').click()" }}>
+                {% else %}
+                    {{ form_widget(form.introduction_images, { attr : { accept : 'image/*', style : 'display:none;' } }) }}
+                    {{ form_errors(form.introduction_images) }}
+                {% endif %}
+                <a class="btn btn-ec-regular mr-2" onclick={{ field_name == 'top_images' ? "$('#admin_shop_top_images').click()" : "$('#admin_shop_introduction_images').click()"}}  }}>
                     {{ 'admin.common.file_select'|trans }}
                 </a>
-            </div><!-- /.media-body -->
-        </div><!-- /.media -->
+            </div>
+        </div>
     </div>
 </div>
+
+

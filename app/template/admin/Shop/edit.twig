@@ -419,13 +419,20 @@ file that was distributed with this source code.
                                     </div>
                                 </div>
 
-                                {%
+                               {%
                                     include
                                         "Subview/multiple_image_upload.twig" with
                                         {
                                             "field_name": "top_images",
                                             "form": form,
-                                            "image_url": url("admin_shop_image_add", {"field_name": "top_images"})
+                                        }
+                                %}
+                                {%
+                                    include
+                                        "Subview/top_images_upload.twig" with
+                                        {
+                                            "field_name": "top_images",
+                                            "form": form,
                                         }
                                 %}
                                 
@@ -578,7 +585,6 @@ file that was distributed with this source code.
                                     </div>
                                 </div>
 
-
                                 <div class="row mb-2">
                                     <div class="col-3">
                                         <span>こだわり条件</span>
@@ -596,6 +602,59 @@ file that was distributed with this source code.
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>店舗紹介タイトル</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.introduction_title) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.introduction_title) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>店舗紹介</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.introduction) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.introduction) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {%
+                                    include
+                                        "Subview/multiple_image_upload.twig" with
+                                        {
+                                            "field_name": "introduction_images",
+                                            "form": form,
+                                        }
+                                %}
+                                {%
+                                    include
+                                        "Subview/intro_images_upload.twig" with
+                                        {
+                                            "field_name": "introduction_images",
+                                            "form": form,
+                                        }
+                                %}
 
                                 <div class="row mb-2">
                                     <div class="col-3">

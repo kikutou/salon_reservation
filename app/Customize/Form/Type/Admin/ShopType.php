@@ -172,7 +172,7 @@ class ShopType extends AbstractType
                 'required' => false,
                 'mapped' => false,
             ])
-            // 画像
+            // トップイメージ
             ->add('images', CollectionType::class, [
                 'entry_type' => HiddenType::class,
                 'prototype' => true,
@@ -188,6 +188,38 @@ class ShopType extends AbstractType
                 'allow_delete' => true,
             ])
             ->add('top_delete_images', CollectionType::class, [
+                'entry_type' => HiddenType::class,
+                'prototype' => true,
+                'mapped' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+            ])
+            ->add('top_images', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+                'mapped' => false,
+            ])
+            // 店舗画像
+            ->add('introduction_images', FileType::class, [
+                'multiple' => false,
+                'required' => false,
+                'mapped' => false,
+            ])
+            ->add('intro_images', CollectionType::class, [
+                'entry_type' => HiddenType::class,
+                'prototype' => true,
+                'mapped' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+            ])
+            ->add('intro_add_images', CollectionType::class, [
+                'entry_type' => HiddenType::class,
+                'prototype' => true,
+                'mapped' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+            ])
+            ->add('intro_delete_images', CollectionType::class, [
                 'entry_type' => HiddenType::class,
                 'prototype' => true,
                 'mapped' => false,
@@ -223,6 +255,8 @@ class ShopType extends AbstractType
                 'multiple' => false,
                 'required' => false,
             ])
+            ->add('introduction_title', TextareaType::class)
+            ->add('introduction', TextareaType::class)
             ->add('commitment_title_1', TextareaType::class)
             ->add('commitment_title_2', TextareaType::class)
             ->add('environment_title_1', TextareaType::class)

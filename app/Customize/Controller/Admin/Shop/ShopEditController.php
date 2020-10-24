@@ -71,7 +71,7 @@ class ShopEditController extends AbstractController
 
         $form = $builder->getForm();
         
-        // 元ファイルを画面にセット
+        // トップイメージ元ファイルを画面にセット
         $images = [];
         if (!is_null($Shop->getTopImages())) {
             $topImages = json_decode($Shop->getTopImages(), true);
@@ -82,6 +82,18 @@ class ShopEditController extends AbstractController
         // ソート
         ksort($images);
         $form['images']->setData($images);
+
+        // 店舗画像を画面にセット
+        $intro_images = [];
+        if (!is_null($Shop->getIntroductionImages())) {
+            $introImages = json_decode($Shop->getIntroductionImages(), true);
+            foreach ($introImages as $introImageFileName => $introImage) {
+                $intro_images[$introImage['sort']] = $introImageFileName;
+            }
+        }
+        // ソート
+        ksort($intro_images);
+        $form['intro_images']->setData($intro_images);
         // 元ファイル名を取得
         $originImages = [
             'logo' => $Shop->getLogo(),
@@ -109,7 +121,7 @@ class ShopEditController extends AbstractController
                 if ($request->get('image_delete_flg') != '') {
                     $image_delete_flgs = explode(',', $request->get('image_delete_flg'));
                 }
-                // ファイルアップロードあり
+                // ファイルアップロードあり(単数の場合)
                 if (count($shopImages) > 0) {
                     foreach ($shopImages as $key => $image) {
                         if (!is_null($image)) {
@@ -192,17 +204,43 @@ class ShopEditController extends AbstractController
                     }
                     $this->deleteFile($top_delete_image);
                 }
+                
 
-                // トップイメージ画像ソート順
+                // 店舗画像の登録
+                $intro = json_decode($Shop->getIntroductionImages(), true);
+                if ($intro === null) {
+                    $intro = [];
+                }
+
+                $intro_add_images = $form->get('intro_add_images')->getData();
+                foreach ($intro_add_images as $intro_add_image) {
+                    $intro[$intro_add_image] = ['sort' => ''];
+
+                    // 移動
+                    $this->saveFile($intro_add_image);
+                }
+
+                // 店舗画像の削除
+                $intro_delete_images = $form->get('intro_delete_images')->getData();
+                foreach ($intro_delete_images as $intro_delete_image) {
+                    if (array_key_exists($intro_delete_image, $intro)) {
+                        unset($intro[$intro_delete_image]);
+                    }
+                    $this->deleteFile($intro_delete_image);
+                }
+                
+                // 画像ソート順
                 $sortNos = $request->get('sort_no_images');
                 if ($sortNos) {
                     foreach ($sortNos as $sortNo) {
                         list($filename, $sortNo_val) = explode('//', $sortNo);
-                        $top[$filename]['sort'] = $sortNo_val;
+                        if (array_key_exists($filename, $top)) $top[$filename]['sort'] = $sortNo_val;
+                        if (array_key_exists($filename, $intro)) $intro[$filename]['sort'] = $sortNo_val;
                     }
                 }
-
+                
                 $Shop->setTopImages($top != [] ? json_encode($top) : null);
+                $Shop->setIntroductionImages($intro != [] ? json_encode($intro) : null);
 
                 $this->entityManager->persist($Shop);
                 $this->entityManager->flush();

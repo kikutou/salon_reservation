@@ -1,0 +1,106 @@
+
+{#field_name, add_images, delete_images, images#}
+<script>
+    $(function() {
+        $('#thumb_introduction_images').sortable({
+            cursor: 'move',
+            opacity: 0.7,
+            placeholder: 'ui-state-highlight',
+            update: function(event, ui) {
+                updateSortNoIntro();
+            }
+        });
+        var proto_img = '<div class="c-form__fileUploadThumbnail" style="background-image:url(\'__path__\');">' +
+            '<a class="delete-image"><i class="fa fa-times" aria-hidden="true"></i></a>' +
+            '</div>';
+            
+        var hideThumbnailIntro = function() {
+            if ($("#thumb_introduction_images div").length > 0) {
+                $("#icon_no_image").css("display", "none");
+                $('#message_introduction_images').html("{{ 'admin.common.drag_and_drop_description'|trans }}");
+            } else {
+                $("#icon_no_image").css("display", "");
+                $('#message_introduction_images').empty();
+            }
+        };
+        // Todo: fix update sort by drag&drop
+        var updateSortNoIntro = function() {
+            $("#thumb_introduction_images div").each(function(index) {
+                $(this).find(".sort_no_images").remove();
+                filename = $(this).find("input[type='hidden']").val();
+                $sortNo = $('<input type="hidden" class="sort_no_images" name="sort_no_images[]" />');
+                $sortNo.val(filename + '//' + parseInt(index + 1));
+                $(this).append($sortNo);
+            });
+        };
+        hideThumbnailIntro();
+        updateSortNoIntro();
+
+        // 店舗画像アップロード
+        var intro_add = '{{ form_widget(form.intro_add_images.vars.prototype) }}';
+        var intro_del = '{{ form_widget(form.intro_delete_images.vars.prototype) }}';
+        {% for intro_image in form.intro_images %}
+        var $intro_img = $(proto_img.replace(/__path__/g, '{{ asset(intro_image.vars.value, 'save_image') }}'));
+        var $intro_widget = $('{{ form_widget(intro_image) }}');
+        $intro_widget.val('{{ intro_image.vars.value }}');
+        $("#thumb_introduction_images").append($intro_img.append($intro_widget));
+        {% endfor %}
+        {% for intro_add_image in form.intro_add_images %}
+        var $intro_img = $(proto_img.replace(/__path__/g, '{{ asset(intro_add_image.vars.value, 'temp_image') }}'));
+        var $intro_widget = $('{{ form_widget(intro_add_image) }}');
+        $intro_widget.val('{{ intro_add_image.vars.value }}');
+        $("#thumb_introduction_images").append($intro_img.append($intro_widget));
+        {% endfor %}
+        {% for intro_delete_image in form.intro_delete_images %}
+        $("#thumb_introduction_images").append('{{ form_widget(intro_delete_image) }}');
+        {% endfor %}
+
+        // 店舗画像削除
+        var intro_count_del = 0;
+        $("#thumb_introduction_images").on("click", '.delete-image', function() {
+            var $intro_new_delete_image = $(intro_del.replace(/__name__/g, intro_count_del));
+            var thumbnail = $(this).parents('div.c-form__fileUploadThumbnail');
+            var src = $(thumbnail).find('input').val();
+            $intro_new_delete_image.val(src);
+            $("#thumb_introduction_images").append($intro_new_delete_image);
+            $(thumbnail).remove();
+            hideThumbnailIntro();
+            updateSortNoIntro();
+            intro_count_del++;
+        });
+        // 店舗画像アップロード
+        var intro_count_add = {{ form.intro_add_images|length|default(0) }};
+        $('#{{ form.introduction_images.vars.id }}').fileupload({
+            url: "{{ url('admin_shop_image_add', { field_name : 'introduction_images' }) }}",
+            type: "post",
+            sequentialUploads: true,
+            dataType: 'json',
+            dropZone: $('#upload-zone-introduction_images'),
+            done: function(e, data) {
+                $.each(data.result.files, function(index, file) {
+                    var path = '{{ asset('', 'temp_image') }}' + file;
+                    var $img = $(proto_img.replace(/__path__/g, path));
+                    var $new_img = $(intro_add.replace(/__name__/g, intro_count_add));
+                    $new_img.val(file);
+                    $child = $img.append($new_img);
+                    $('#thumb_introduction_images').append($child);
+                    intro_count_add++;
+                });
+                hideThumbnailIntro();
+                updateSortNoIntro();
+            },
+            fail: function(e, data) {
+                alert("{{ 'admin.common.upload_error'|trans }}");
+            },
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxFileSize: 10000000,
+            maxNumberOfFiles: 10,
+            processalways: function(e, data) {
+                if (data.files.error) {
+                    alert("{{ 'admin.common.upload_error'|trans }}");
+                }
+            }
+        });
+        
+    });
+</script>
