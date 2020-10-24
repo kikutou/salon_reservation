@@ -14,6 +14,7 @@
 namespace Customize\Controller\Admin\Staff;
 
 use Customize\Form\Type\Admin\SearchStaffType;
+use Customize\Repository\ShopRepository;
 use Customize\Repository\StaffRepository;
 use Doctrine\ORM\QueryBuilder;
 use Eccube\Controller\AbstractController;
@@ -63,6 +64,8 @@ class StaffController extends AbstractController
 
     protected $staffRepository;
 
+    protected $shopRepository;
+
     public function __construct(
         PageMaxRepository $pageMaxRepository,
         CustomerRepository $customerRepository,
@@ -70,7 +73,8 @@ class StaffController extends AbstractController
         PrefRepository $prefRepository,
         MailService $mailService,
         CsvExportService $csvExportService,
-		StaffRepository $staffRepository
+		StaffRepository $staffRepository,
+		ShopRepository $shopRepository
     ) {
         $this->pageMaxRepository = $pageMaxRepository;
         $this->customerRepository = $customerRepository;
@@ -79,6 +83,7 @@ class StaffController extends AbstractController
         $this->mailService = $mailService;
         $this->csvExportService = $csvExportService;
         $this->staffRepository = $staffRepository;
+        $this->shopRepository = $shopRepository;
     }
 
     /**
@@ -144,6 +149,11 @@ class StaffController extends AbstractController
 
         /** @var QueryBuilder $qb */
         $qb = $this->staffRepository->getQueryBuilderBySearchData($searchData);
+
+	    if(($this->getUser()->getAuthority()->getId() == 2)) {
+	    	$Shop = $this->shopRepository->findOneBy(["memberId" => $this->getUser()->getId()]);
+		    $qb->andWhere("s.shopId = :shop_id")->setParameter("shop_id", $Shop->getId());
+	    }
 
 
         $pagination = $paginator->paginate(

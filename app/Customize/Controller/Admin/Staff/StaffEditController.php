@@ -15,8 +15,10 @@ namespace Customize\Controller\Admin\Staff;
 
 use Customize\Entity\Staff;
 use Customize\Form\Type\Admin\StaffType;
+use Customize\Repository\ShopRepository;
 use Customize\Repository\StaffRepository;
 use Eccube\Controller\AbstractController;
+use Eccube\Entity\Member;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Filesystem\Filesystem;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -35,13 +37,16 @@ class StaffEditController extends AbstractController
      * @var EncoderFactoryInterface
      */
     protected $encoderFactory;
+    protected $shopRepository;
 
     public function __construct(
         StaffRepository $staffRepository,
-        EncoderFactoryInterface $encoderFactory
+        EncoderFactoryInterface $encoderFactory,
+		ShopRepository $shopRepository
     ) {
         $this->staffRepository = $staffRepository;
         $this->encoderFactory = $encoderFactory;
+        $this->shopRepository = $shopRepository;
     }
 
     /**
@@ -71,8 +76,14 @@ class StaffEditController extends AbstractController
         } else {
             $Staff = new Staff();
             $Staff->setCreateDate(new \DateTime());
-            // TODO shop ID
-            $Staff->setShopId(20);
+
+
+            if(($this->getUser()->getAuthority()->getId() == 2)) {
+
+            	$Shop = $this->shopRepository->findOneBy(["memberId" => $this->getUser()->getId()]);
+	            $Staff->setShopId($Shop->getId());
+            }
+
         }
         
         // スタッフ登録フォーム

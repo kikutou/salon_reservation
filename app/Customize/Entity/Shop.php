@@ -1295,6 +1295,36 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	}
 
 
+	public function getAuthenticatedByAdminStatus() {
+		if($this->getAuthenticatedByAdmin() == 1) {
+			return "審査中";
+		}
+
+		if($this->getAuthenticatedByAdmin() == 2) {
+			return "審査済み";
+		}
+
+		if($this->getAuthenticatedByAdmin() == 1) {
+			return "却下";
+		}
+
+		return "状況不明";
+	}
+
+
+	public function getPublicStatusString() {
+		if($this->getPublicStatus() == 1) {
+			return "非公開";
+		}
+
+		if($this->getPublicStatus() == 2) {
+			return "公開";
+		}
+
+		return "状況不明";
+	}
+
+
 
 
 
