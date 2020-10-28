@@ -162,6 +162,9 @@ class ShopType extends AbstractType
             ->add('question', TextType::class, [
                 'required' => false,
             ])
+            ->add('hotpepper_store_id', TextType::class, [
+                'required' => false,
+            ])
             ->add('logo', FileType::class, [
                 'multiple' => false,
                 'required' => false,

@@ -245,7 +245,10 @@ class StaffType extends AbstractType
                         'max' => $this->eccubeConfig['eccube_ltext_len'],
                     ]),
                 ],
-			]);
+            ])
+            ->add('hotpepper_staff_id', TextType::class, [
+                'required' => false,
+            ]);
 		
 
 //        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {

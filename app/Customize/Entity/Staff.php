@@ -26,7 +26,14 @@ class Staff extends \Eccube\Entity\AbstractEntity
      *
      * @ORM\Column(name="shop_id", type="integer", nullable=false)
      */
-    private $shopId;
+	private $shopId;
+	
+	/**
+     * @var int|null
+     *
+     * @ORM\Column(name="hotpepper_staff_id", type="integer", nullable=true, options={"unsigned"=true})
+     */
+    private $hotpepperStaffId;
 
     /**
      * @var string|null
@@ -198,6 +205,22 @@ class Staff extends \Eccube\Entity\AbstractEntity
 	public function setShopId(int $shopId): void
 	{
 		$this->shopId = $shopId;
+	}
+
+	/**
+	 * @return int|null
+	 */
+	public function getHotpepperStaffId(): ?int
+	{
+		return $this->hotpepperStaffId;
+	}
+
+	/**
+	 * @param int|null $hotpepperStaffId
+	 */
+	public function setHotpepperStaffId(?int $hotpepperStaffId): void
+	{
+		$this->hotpepperStaffId = $hotpepperStaffId;
 	}
 
 	/**
