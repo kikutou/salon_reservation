@@ -31,16 +31,16 @@ class StaffMenu extends \Eccube\Entity\AbstractEntity
     /**
      * @var int
      *
-     * @ORM\Column(name="staff_id", type="integer", nullable=false)
+     * @ORM\Column(name="staff_id", type="integer", nullable=true)
      */
     private $staffId;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="product_id", type="integer", nullable=false)
+     * @ORM\Column(name="menu_id", type="integer", nullable=true)
      */
-    private $productId;
+    private $menuId;
 
 	/**
 	 * @return int
@@ -77,7 +77,7 @@ class StaffMenu extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return int
 	 */
-	public function getStaffId(): int
+	public function getStaffId(): ?int
 	{
 		return $this->staffId;
 	}
@@ -85,7 +85,7 @@ class StaffMenu extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @param int $staffId
 	 */
-	public function setStaffId(int $staffId): void
+	public function setStaffId(?int $staffId): void
 	{
 		$this->staffId = $staffId;
 	}
@@ -93,17 +93,17 @@ class StaffMenu extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return int
 	 */
-	public function getProductId(): int
+	public function getMenuId(): ?int
 	{
-		return $this->productId;
+		return $this->menuId;
 	}
 
 	/**
-	 * @param int $productId
+	 * @param int $menuId
 	 */
-	public function setProductId(int $productId): void
+	public function setMenuId(?int $menuId): void
 	{
-		$this->productId = $productId;
+		$this->menuId = $menuId;
 	}
 
 }

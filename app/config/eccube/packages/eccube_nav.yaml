@@ -17,6 +17,23 @@ parameters:
                 staff_edit:
                     name: スタッフ登録
                     url: admin_staff_new
+        menu:
+            name: メニュー管理
+            icon: fa-cube
+            children:
+                menu_master:
+                    name: メニュー覧
+                    url: admin_menu
+                menu_edit:
+                    name: メニュー登録
+                    url: admin_menu_new
+        reservation:
+            name: 予約管理
+            icon: fa-shopping-cart
+            children:
+                reservation_master:
+                    name: 予約ー覧
+                    url: admin_reservation
         product:
             name: admin.product.product_management
             icon: fa-cube

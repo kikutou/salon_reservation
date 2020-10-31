@@ -218,9 +218,9 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	private $staffNumber;
 	
 	/**
-     * @var int|null
+     * @var string|null
      *
-     * @ORM\Column(name="hotpepper_store_id", type="integer", nullable=true, options={"unsigned"=true})
+     * @ORM\Column(name="hotpepper_store_id", type="text", length=65535, nullable=true)
      */
     private $hotpepperStoreId;
 
@@ -847,17 +847,17 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	}
 
 	/**
-	 * @return int|null
+	 * @return null|string
 	 */
-	public function getHotpepperStoreId(): ?int
+	public function getHotpepperStoreId(): ?string
 	{
 		return $this->hotpepperStoreId;
 	}
 
 	/**
-	 * @param int|null $hotpepperStoreId
+	 * @param null|string $hotpepperStoreId
 	 */
-	public function setHotpepperStoreId(?int $hotpepperStoreId): void
+	public function setHotpepperStoreId(?string $hotpepperStoreId): void
 	{
 		$this->hotpepperStoreId = $hotpepperStoreId;
 	}
