@@ -50,6 +50,6 @@ class MenuRepository extends \Eccube\Repository\AbstractRepository
     {
         $em = $this->getEntityManager();
         $em->persist($Menu);
-        $em->flush($Menu);
+        $em->flush();
     }
 }

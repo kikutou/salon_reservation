@@ -14,7 +14,10 @@
 namespace Customize\Form\Type\Admin;
 
 use Eccube\Common\EccubeConfig;
+use function PHPSTORM_META\type;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -46,6 +49,9 @@ class MenuType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+	        ->add("shop_id", HiddenType::class,[
+	        	"required" => false,
+	        ])
             ->add('title', TextType::class, [
 				'required' => false,
 				'constraints' => [

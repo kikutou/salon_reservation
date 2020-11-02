@@ -65,10 +65,6 @@ class MenuEditController extends AbstractController
             $Menu = new Menu();
             $Menu->setCreateDate(new \DateTime());
 
-            if(($this->getUser()->getAuthority()->getId() == 2)) {
-            	$Shop = $this->shopRepository->findOneBy(["memberId" => $this->getUser()->getId()]);
-	            $Menu->setShopId($Shop->getId());
-            }
         }
         
         // メニュー登録フォーム
@@ -78,6 +74,16 @@ class MenuEditController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+
+        	$Menu = $form->getData();
+
+	        if(($this->getUser()->getAuthority()->getId() == 2)) {
+		        $Shop = $this->shopRepository->findOneBy(["memberId" => $this->getUser()->getId()]);
+
+		        $Menu->setShop($Shop);
+//		        $Menu->setShopId($Shop->getId());
+	        }
 
             $this->menuRepository->save($Menu);
             $this->addSuccess('admin.common.save_complete', 'admin');

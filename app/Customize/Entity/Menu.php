@@ -113,7 +113,7 @@ class Menu extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @return int
 	 */
-	public function getShopId(): int
+	public function getShopId(): ?int
 	{
 		return $this->shopId;
 	}
