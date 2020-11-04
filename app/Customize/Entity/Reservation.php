@@ -38,21 +38,21 @@ class Reservation extends \Eccube\Entity\AbstractEntity
     /**
      * @var int
      *
-     * @ORM\Column(name="shop_id", type="integer", nullable=true)
+     * @ORM\Column(name="shop_id", type="integer", nullable=true, options={"unsigned"=true})
      */
     private $shopId;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="menu_id", type="integer", nullable=true)
+     * @ORM\Column(name="menu_id", type="integer", nullable=true, options={"unsigned"=true})
      */
     private $menuId;
 
 	/**
 	 * @var int
 	 *
-	 * @ORM\Column(name="staff_id", type="integer", nullable=true)
+	 * @ORM\Column(name="staff_id", type="integer", nullable=true, options={"unsigned"=true})
 	 */
 	private $staffId;
 
@@ -115,7 +115,7 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @var int
 	 *
-	 * @ORM\Column(name="customer_id", type="integer", nullable=true)
+	 * @ORM\Column(name="customer_id", type="integer", nullable=true, options={"unsigned"=true})
 	 */
 	private $customerId;
 
