@@ -24,7 +24,7 @@ class Menu extends \Eccube\Entity\AbstractEntity
     /**
      * @var int
      *
-     * @ORM\Column(name="shop_id", type="integer", nullable=false)
+     * @ORM\Column(name="shop_id", type="integer", nullable=false, options={"unsigned"=true})
      */
     private $shopId;
 
