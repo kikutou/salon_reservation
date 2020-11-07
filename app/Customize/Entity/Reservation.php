@@ -75,7 +75,14 @@ class Reservation extends \Eccube\Entity\AbstractEntity
      *
      * @ORM\Column(name="canceled_at", type="datetime", nullable=true)
      */
-    private $canceledAt;
+	private $canceledAt;
+	
+	/**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="canceled_at_by_user", type="datetime", nullable=true)
+     */
+    private $canceledAtByUser;
 	
 	/**
      * @var string|null
@@ -365,6 +372,9 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	 */
 	public function getCanceledAt(): ?\DateTime
 	{
+		if ($this->canceledAt < $this->canceledAtByUser) {
+			return $this->canceledAtByUser;
+		}
 		return $this->canceledAt;
 	}
 
@@ -374,6 +384,22 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	public function setCanceledAt(?\DateTime $canceledAt): void
 	{
 		$this->canceledAt = $canceledAt;
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getCanceledAtByUser(): ?\DateTime
+	{
+		return $this->canceledAtByUser;
+	}
+
+	/**
+	 * @param \DateTime|null $canceledAtByUser
+	 */
+	public function setCanceledAtByUser(?\DateTime $canceledAtByUser): void
+	{
+		$this->canceledAtByUser = $canceledAtByUser;
 	}
 
 	/**

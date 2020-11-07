@@ -80,6 +80,7 @@ class ReservationEditController extends AbstractController
                 $Reservation->setCanceledAt(new \DateTime());
             } elseif ($form->getData()['status'] != 3) {
                 $Reservation->setCanceledAt(null);
+                $Reservation->setCanceledAtByUser(null);
             }
             
             $this->reservationRepository->save($Reservation);

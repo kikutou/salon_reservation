@@ -1,1 +1,583 @@
 /* カスタマイズ用CSS */
+.reserveConditionTable {
+    margin-top: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+th {
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: bold;
+    
+}
+
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+
+table {
+    color: #333333;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.innerTable {
+    border: solid #BFB9B0;
+    border-spacing: 0;
+    border-width: 0 1px 1px 1px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.innerCol,
+.telCol,
+.closeCol {
+    box-sizing: border-box;
+    text-align: center;
+    width: 42px;
+}
+
+.telCol {
+    background-color: #FFFFFF;
+}
+
+.closeCol {
+    background-color: #EEEEEE;
+}
+
+.timeCell {
+    background-color: #F6F6F6;
+    border-top: 1px solid #BFB9B0;
+    font-size: 11px;
+    height: 35px;
+    line-height: 35px;
+    width: 100%;
+}
+
+.timeCell.timeSharpLine {
+    font-size: 13px;
+}
+
+.weekPaging {
+    background-color: #FFFFFF;
+    border: solid #BFB9B0;
+    border-width: 1px 0 2px 0;
+    font-weight: bold;
+    text-align: center;
+    width: 87px;
+}
+
+.monthCell {
+    border-top: 1px solid #BFB9B0;
+    box-sizing: border-box;
+    height: 38px;
+    text-align: center;
+}
+
+.timeTableLeft .timeCell {
+    text-align: right;
+    padding-right: 15px;
+}
+
+.timeTableRight .timeCell {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.dayCell,
+.sat,
+.sun {
+    border: solid #BFB9B0;
+    border-width: 1px 0 2px 1px;
+    box-sizing: border-box;
+    height: 45px;
+    text-align: center;
+    width: 42px;
+}
+
+.sat {
+    background-color: #D9E3EC;
+    color: #4466BB;
+}
+
+.sun {
+    background-color: #EEDDD9;
+    color: #BB5555;
+}
+
+.closeCell {
+    background-color: #EEEEEE;
+}
+
+.openCell {
+    background-color: #FFFFFF;
+    -webkit-transition: background-color 0.1s;
+    transition: background-color 0.1s;
+}
+
+.moreInnerTable tr:first-child > th,
+.moreInnerTable tr:first-child > td {
+    border-top: none;
+}
+
+.moreInnerTable tr:not(:first-child) > .timeSharpLine {
+    border-top: 2px solid #BFB9B0;
+}
+
+.moreInnerTable tr:last-child > .timeCell {
+    border-bottom : none;
+}
+
+.openCell > .icnOpen {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    text-indent: -9999px;
+    width: auto;
+}
+
+.openCell > .icnOpen:hover {
+    background-color: #FCDBE3;
+    text-decoration: none;
+}
+
+.openCell > span.icnOpen:hover {
+    background-color: #FFFFFF;
+}
+
+.openCell > .icnOpen::before,
+.openCell > .icnOpen::after {
+    border: 1px solid #CC4466;
+    border-radius: 100px;
+    content: "";
+    display: block;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+}
+
+.openCell.isDisabled > .icnOpen::before,
+.openCell.isDisabled > .icnOpen::after {
+    border: 1px solid #CCCCCC;
+}
+
+.openCell > .icnOpen::before {
+    height: 14px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 14px;
+}
+
+.openCell > .icnOpen::after {
+    height: 8px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 8px;
+}
+
+.temporaryReserve .icnOpen::after {
+    display: none;
+}
+
+.closeCell > .icnClose {
+    display: block;
+    line-height: 30px;
+    overflow: hidden;
+    position: relative;
+    text-indent: -9999px;
+    width: auto;
+}
+
+.closeCell > .icnClose::before,
+.closeCell > .icnClose::after {
+    background: #333333;
+    content: "";
+    display: block;
+    height: 1px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 16px;
+    width: 10px;
+}
+
+.closeCell.isDisabled,
+.telCell.isDisabled {
+    background: #FFFFFF;
+    color: #CCCCCC !important;
+}
+
+.closeCell.isDisabled > .icnClose::before,
+.closeCell.isDisabled > .icnClose::after {
+    background: #CCCCCC;
+}
+
+.closeCell > .icnClose::before {
+    -webkit-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.closeCell > .icnClose::after {
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.arrowPagingWeekLOff {
+    background-position: -196px -364px;
+    padding-left: 8px;
+}
+
+.weekPaging > .arrowPagingWeekROff,
+.weekPaging > .arrowPagingWeekR,
+.weekPaging > .arrowPagingWeekLOff,
+.weekPaging > .arrowPagingWeekL {
+    position: relative;
+}
+
+.weekPaging > .arrowPagingWeekROff:before,
+.weekPaging > .arrowPagingWeekR:before,
+.weekPaging > .arrowPagingWeekLOff:before,
+.weekPaging > .arrowPagingWeekL:before {
+    border-bottom: 4px solid transparent;
+    border-top: 4px solid transparent;
+    position: absolute;
+    content: '';
+    background-repeat: no-repeat;
+    width: 0;
+    height: 0;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.weekPaging > .arrowPagingWeekROff,
+.weekPaging > .arrowPagingWeekLOff {
+    color: #CCCCCC;
+}
+
+.weekPaging > .arrowPagingWeekROff:before {
+    border-left: 4px solid #CCCCCC;
+    right: 0;
+}
+
+.weekPaging > .arrowPagingWeekR:before {
+    border-left: 4px solid #D36985;
+    left: 63px;
+}
+
+.weekPaging > .arrowPagingWeekLOff:before {
+    border-right: 4px solid #CCCCCC;
+    left: 0;
+}
+
+.weekPaging > .arrowPagingWeekL:before {
+    border-right: 4px solid #D36985;
+    left: 0;
+}
+
+.monthCell,
+.dayCell {
+    background-color: #FFFFFF;
+}
+
+.innerTable > thead > tr:first-child > th + th {
+    border-left: 1px solid #BFB9B0;
+}
+
+.innerTable > thead > tr > th {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: 1;
+}
+
+.innerTable > thead > tr:first-child > th {
+    top: 0;
+}
+
+.innerTable > thead > .dayCellContainer > th {
+    top: 38px;
+}
+
+.timeTableLeft,
+.timeTableRight {
+    width: 87px;
+}
+
+.coverTable {
+    background-color: #F5F3EF;
+    border-bottom: #DDDDDD solid 1px;
+    border-left: #DDDDDD solid 1px;
+    border-right: #DDDDDD solid 1px;
+    display: block;
+    padding: 5px;
+}
+
+.telCol {
+    background-color: #FFFFFF;
+}
+
+.closeCol {
+    background-color: #EEEEEE;
+}
+
+.telColText,
+.closeColText {
+    left: 50%;
+    position: absolute;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    -ms-writing-mode: bt-rl;
+    -webkit-writing-mode: vertical-rl;
+    writing-mode: vertical-rl;
+}
+
+.telColText {
+    letter-spacing: 2px;
+    top: calc(50% + 1px);
+}
+
+.closeColText {
+    letter-spacing: 10px;
+    top: calc(50% + 5px);
+}
+
+.timeCell {
+    background-color: #F6F6F6;
+    border-top: 1px solid #BFB9B0;
+    font-size: 11px;
+    height: 40px;
+    line-height: 35px;
+    width: 100%;
+}
+
+.timeCell.timeSharpLine {
+    font-size: 13px;
+}
+
+.weekPaging {
+    background-color: #FFFFFF;
+    border: solid #BFB9B0;
+    border-width: 1px 0 2px 0;
+    font-weight: bold;
+    text-align: center;
+    width: 87px;
+}
+
+.monthCell {
+    border-top: 1px solid #BFB9B0;
+    box-sizing: border-box;
+    height: 38px;
+    text-align: center;
+}
+
+.timeTableLeft .timeCell {
+    text-align: right;
+    padding-right: 15px;
+}
+
+.timeTableRight .timeCell {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.closeCell,
+.openCell,
+.telCell {
+    border: solid #BFB9B0;
+    border-width: 1px 0 0 0;
+    height: 40px;
+    text-align: center;
+    width: auto;
+}
+
+.dayCell,
+.sat,
+.sun {
+    border: solid #BFB9B0;
+    border-width: 1px 0 2px 1px;
+    box-sizing: border-box;
+    height: 45px;
+    text-align: center;
+    width: 42px;
+}
+
+.sat {
+    background-color: #D9E3EC;
+    color: #4466BB;
+}
+
+.sun {
+    background-color: #EEDDD9;
+    color: #BB5555;
+}
+
+.closeCell {
+    background-color: #EEEEEE;
+}
+
+.openCell {
+    background-color: #FFFFFF;
+    -webkit-transition: background-color 0.1s;
+    transition: background-color 0.1s;
+}
+
+.moreInnerTable tr:first-child > th,
+.moreInnerTable tr:first-child > td {
+    border-top: none;
+}
+
+.moreInnerTable tr:not(:first-child) > .timeSharpLine {
+    border-top: 2px solid #BFB9B0;
+}
+
+.moreInnerTable tr:last-child > .timeCell {
+    border-bottom : none;
+}
+
+.openCell > .icnOpen {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    text-indent: -9999px;
+    width: auto;
+}
+
+.openCell > .icnOpen:hover {
+    background-color: #FCDBE3;
+    text-decoration: none;
+}
+
+.openCell > span.icnOpen:hover {
+    background-color: #FFFFFF;
+}
+
+.openCell > .icnOpen::before,
+.openCell > .icnOpen::after {
+    border: 1px solid #CC4466;
+    border-radius: 100px;
+    content: "";
+    display: block;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+}
+
+.openCell.isDisabled > .icnOpen::before,
+.openCell.isDisabled > .icnOpen::after {
+    border: 1px solid #CCCCCC;
+}
+
+.openCell > .icnOpen::before {
+    height: 14px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 14px;
+}
+
+.openCell > .icnOpen::after {
+    height: 8px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 8px;
+}
+
+.innerTable {
+    border: solid #BFB9B0;
+    border-spacing: 0;
+    border-width: 0 1px 1px 1px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.innerTable > tbody > tr > th + th {
+    border-left: 1px solid #BFB9B0;
+}
+
+.moreInnerTable {
+    border: 0 none;
+    border-collapse: collapse;
+    width: 100%;
+    border-spacing: 0;
+    padding: 0;
+    margin: 0;
+    height: 230px;
+    position: relative;
+}
+
+.monthCell,
+.dayCell {
+    background-color: #FFFFFF;
+}
+
+.innerTable > thead > tr:first-child > th + th {
+    border-left: 1px solid #BFB9B0;
+}
+
+.innerTable > thead > tr > th {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: 1;
+}
+
+.innerTable > thead > tr:first-child > th {
+    top: 0;
+}
+
+.innerTable > thead > .dayCellContainer > th {
+    top: 38px;
+}
+
+.timeTableLeft,
+.timeTableRight {
+    width: 87px;
+}
+
+.cloneHead {
+    border: solid #BFB9B0;
+    border-width: 0 1px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    width: 765px;
+    z-index: 1;
+}
+
+table	{ border-spacing: 0; margin:20px}
+th		{ text-align: left; }
+
+#jsRsvCdTbl {
+    width:700px;
+    height:960px
+}
+
+.staff-list {
+    width:100px;
+    height:35px;
+    background: #F95A6B;
+    background: linear-gradient(to bottom, #FF9BA2 0%,#F95A6B 75%,#F85164 100%);
+    border: 1px solid #DA949B;
+    border-radius: 4px;
+    box-shadow: inset 1px 1px 3px #F9D8DB, inset -1px -1px 3px #FFA6AE;
+    color: #FFFFFF !important;
+    padding: 1px;
+    font-size: 11px;
+    margin-top: 5px;
+}
