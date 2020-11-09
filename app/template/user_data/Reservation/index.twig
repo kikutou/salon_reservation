@@ -10,12 +10,52 @@ file that was distributed with this source code.
 #}
 {% extends 'default_frame.twig' %}
 
+{% block javascript %}
+    <script>
+    var getUrlParameter = function getUrlParameter(sPageURL, sParam) {
+        var sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+
+$(document).ready(function(){
+    $("a.icnOpen").each(function(i,item){
+
+            var original_url = $(item).attr("href");
+            var rsvRequestDate = getUrlParameter(original_url, "rsvRequestDate1");
+            var rsvRequestTime = getUrlParameter(original_url, "rsvRequestTime1");
+            $(item).attr("href", "/" + rsvRequestDate + "/" + rsvRequestTime);
+
+
+    });
+});
+    </script>
+{% endblock javascript %}
+
 {% block main %}
-        
-    {{content|raw}}
+
 
     <div class="ec-shelfRole" style="margin-top:120px">
         <ul class="ec-shelfGrid">
+            <li style="margin-right:50px">
+                <a href="">
+                    <p class="ec-shelfGrid__item-image" style="width:150px;height:160px">
+                        <img src="https://lh3.googleusercontent.com/proxy/SPHFeYMKA8Dgr8bwX2xsTWT9nKDTC4psUwW97Xfwy0zW0eACmJ-6u-yI3yHrDMn93kx8ElyYNoAYwjFOckjAtR9lv4AauJJZp_uB6Kc">
+                    </p>
+                    <div style="text-align:center">
+                        <input name="staff" value="" type="radio" checked="checked">指名なし予約
+                    </div>
+                </a>
+            </li>
+
             {% for id,Staff in Staffs %}
                 <li style="margin-right:50px">
                     <a href="">
@@ -24,13 +64,16 @@ file that was distributed with this source code.
                         </p>
                         <div style="text-align:center">
                             <p>{{ Staff.name }}</p>
-                            <button type="submit" class="staff-list" data-staffid="{{ id }}" form="">
-                                指名して予約
-                            </button>
+                            <input name="staff" value="{{ id }}" type="radio">指名して予約
+
                         </div>
                     </a>
                 </li>
             {% endfor %}
         </ul>
     </div>
+        
+    {{content|raw}}
+
+
 {% endblock %}

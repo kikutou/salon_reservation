@@ -78,17 +78,23 @@ class ReservationController extends AbstractController
         if($html === FALSE ){
             throw new NotFoundHttpException();
         }
-        
-        curl_close($ch);
-        $str = '<div id="jsRsvCdTbl" class="reserveConditionTable  jscInnerTableWrap">';
-        $arr = explode($str, $html);
-        $arr = explode('</div>', $arr[1]);
-        $output = $str . $arr[0] . '</div>';
 
-        // ヘッダー日付の変換
-        $headerHtml = explode('<tr class="dayCellContainer">', $output);
-        $headerHtml = explode('</tr', $headerHtml[1]);
-        $dateArray = explode('</th>', $headerHtml[0]);
+        try {
+	        curl_close($ch);
+	        $str = '<div id="jsRsvCdTbl" class="reserveConditionTable  jscInnerTableWrap">';
+	        $arr = explode($str, $html);
+	        $arr = explode('</div>', $arr[1]);
+	        $output = $str . $arr[0] . '</div>';
+
+	        // ヘッダー日付の変換
+	        $headerHtml = explode('<tr class="dayCellContainer">', $output);
+	        $headerHtml = explode('</tr', $headerHtml[1]);
+	        $dateArray = explode('</th>', $headerHtml[0]);
+        } catch (\Exception $e) {
+        	throw new NotFoundHttpException($e->getMessage());
+        }
+        
+
         
         foreach ($dateArray as $key => $date) {
             if ($key <= 13) {
@@ -98,6 +104,10 @@ class ReservationController extends AbstractController
             }
         }
         $output = str_replace('※来店日条件：指定なし', '', $output);
+
+
+
+
         // スタッフリスト
         $Staffs = $this->staffRepository->findBy(array("shopId" => $shop_id));
         $outputStaff = [];
