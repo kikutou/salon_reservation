@@ -71,19 +71,23 @@ class MenuEditController extends AbstractController
         $builder = $this->formFactory->createBuilder(MenuType::class, $Menu);
 
         $form = $builder->getForm();
-        $form->handleRequest($request);
+
+	    $form->handleRequest($request);
+
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-
         	$Menu = $form->getData();
+
 
 	        if(($this->getUser()->getAuthority()->getId() == 2)) {
 		        $Shop = $this->shopRepository->findOneBy(["memberId" => $this->getUser()->getId()]);
 
 		        $Menu->setShop($Shop);
-//		        $Menu->setShopId($Shop->getId());
+		        $Menu->setShopId($Shop->getId());
 	        }
+
+
 
             $this->menuRepository->save($Menu);
             $this->addSuccess('admin.common.save_complete', 'admin');

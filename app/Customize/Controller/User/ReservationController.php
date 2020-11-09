@@ -13,6 +13,10 @@
 
 namespace Customize\Controller\User;
 
+use Customize\Entity\Menu;
+use Customize\Entity\Shop;
+use Customize\Repository\MenuRepository;
+use Customize\Repository\ShopRepository;
 use Customize\Repository\StaffRepository;
 use Eccube\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -29,23 +33,40 @@ class ReservationController extends AbstractController
      */
     protected $encoderFactory;
     protected $staffRepository;
+    protected $shopRepository;
+    protected $menuRepository;
 
     public function __construct(
         EncoderFactoryInterface $encoderFactory,
-		StaffRepository $staffRepository
+		StaffRepository $staffRepository,
+		ShopRepository $shopRepository,
+		MenuRepository $menuRepository
     ) {
         $this->encoderFactory = $encoderFactory;
         $this->staffRepository = $staffRepository;
+        $this->shopRepository = $shopRepository;
+        $this->menuRepository = $menuRepository;
     }
 
     /**
-     * @Route("/user/reservation", name="user_reservation")
+     * @Route("/user/reservation/{shop_id}/{menu_id}", name="user_reservation")
      * @Template("@user_data/Reservation/index.twig")
      */
-    public function index(Request $request)
+    public function index(Request $request, string $shop_id, string $menu_id)
     {
-      
-        $url = "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=H000116656&couponId=CP00000007108646&add=0&addMenu=0&rootCd=10";
+
+    	$shop = $this->shopRepository->find($shop_id);
+    	$menu = $this->menuRepository->find($menu_id);
+    	if(!$shop || !$menu) {
+    		throw new NotFoundHttpException();
+	    }
+
+    	$store_id = $shop->getHotpepperStoreId();
+    	$menu_id = $menu->getHotpepperMenuId();
+
+    	// "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=H000116656&menuId=MN00000003717887&add=0&addMenu=0&rootCd=10"
+        $url = "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=" . $store_id . "&menuId=" . $menu_id . "&addMenu=0&rootCd=10";
+
         $ch = curl_init();
         
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -78,17 +99,14 @@ class ReservationController extends AbstractController
         }
         $output = str_replace('※来店日条件：指定なし', '', $output);
         // スタッフリスト
-        $Staffs = $this->staffRepository->findAll();
+        $Staffs = $this->staffRepository->findBy(array("shopId" => $shop_id));
         $outputStaff = [];
         if (count($Staffs) > 0) {
             foreach ($Staffs as $Staff) {
-                // todo shop id
-                if ($Staff->getshopId() == 2) {
-                    $outputStaff[$Staff->getId()] = [
-                        'name' => $Staff->getName(), 
-                        'image' => $Staff->getImage(),
-                    ];
-                }
+	            $outputStaff[$Staff->getId()] = [
+		            'name' => $Staff->getName(),
+		            'image' => $Staff->getImage(),
+	            ];
             }
         }
 

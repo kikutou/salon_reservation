@@ -121,7 +121,7 @@ class Menu extends \Eccube\Entity\AbstractEntity
 	/**
 	 * @param int $shopId
 	 */
-	public function setShopId(int $shopId): void
+	public function setShopId(?int $shopId): void
 	{
 		$this->shopId = $shopId;
 	}
