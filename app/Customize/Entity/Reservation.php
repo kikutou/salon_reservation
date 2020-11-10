@@ -31,7 +31,7 @@ class Reservation extends \Eccube\Entity\AbstractEntity
     /**
      * @var int
      *
-     * @ORM\Column(name="starttime", type="integer", nullable=true)
+     * @ORM\Column(name="starttime", type="text", length=65535, nullable=true)
      */
     private $starttime;
 
@@ -214,18 +214,18 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	}
 
 	/**
-	 * @return int
+	 * @return null|string
 	 */
-	public function getStarttime(): ?int
+	public function getStarttime(): ?string
 	{
 		return $this->starttime;
 	}
 
 	/**
-	 * @param int $starttime
+	 * @param null|string $starttime
 	 * @return self
 	 */
-	public function setStarttime(?int $starttime): self
+	public function setStarttime(?string $starttime): self
 	{
 		$this->starttime = $starttime;
 		return $this;

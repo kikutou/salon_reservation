@@ -12,31 +12,44 @@ file that was distributed with this source code.
 
 {% block javascript %}
     <script>
-    var getUrlParameter = function getUrlParameter(sPageURL, sParam) {
-        var sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
+        var getUrlParameter = function getUrlParameter(sPageURL, sParam) {
+            var sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
 
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
 
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
             }
-        }
-    };
+        };
 
-$(document).ready(function(){
-    $("a.icnOpen").each(function(i,item){
+        $(document).ready(function(){
+            $("a.icnOpen").each(function(i,item){
+                var shop_id = {{ shop_id }};
+                var menu_id = {{ menu_id }};
+                var original_url = $(item).attr("href");
+                var rsvRequestDate = getUrlParameter(original_url, "rsvRequestDate1");
+                var rsvRequestTime = getUrlParameter(original_url, "rsvRequestTime1");
+                $(item).attr("href", "/reservation/confirm?shopId=" + shop_id + '&menuId=' + menu_id + '&rsvDate=' + rsvRequestDate + '&rsvTime=' + rsvRequestTime);
+            });
+        });
 
-            var original_url = $(item).attr("href");
-            var rsvRequestDate = getUrlParameter(original_url, "rsvRequestDate1");
-            var rsvRequestTime = getUrlParameter(original_url, "rsvRequestTime1");
-            $(item).attr("href", "/" + rsvRequestDate + "/" + rsvRequestTime);
+        $('input[name="staff"]').change(function(){
+            var staffId = $(this).val();
+            $("a.icnOpen").each(function(i,item){
+                origin_url = $(item).attr('href');
+                var url_arr = origin_url.split('&');
+                if (url_arr.length > 4) {
+                    url_arr = url_arr.slice(0, -1);
+                    origin_url = url_arr.join('&');
+                }
+                $(item).attr("href", origin_url + '&staffId=' + staffId);
+            });
+        });
 
-
-    });
-});
     </script>
 {% endblock javascript %}
 

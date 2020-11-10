@@ -1,0 +1,295 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% block stylesheet %}
+    <style>
+        .reserveTitleOuter {
+            background-position: -3060px top;
+            background-repeat: no-repeat;
+            background-color: #A6A39B;
+            position: relative;
+            zoom: 1;
+            margin-left:20px;
+            width:580px;
+        }
+        .reserveTitle {
+            text-align: left;
+            background-position: -3825px bottom;
+            background-repeat: no-repeat;
+            color: white;
+            font-size: 14px;
+            padding: 6px 10px;
+        }
+        .title_page {
+            position: relative;
+            border-bottom: 3px solid #d36985;
+            color: #333;
+        }
+        .title_page:before {
+            height: 16px;
+            display: inline-block;
+            margin-right: 7px;
+            width: 5px;
+            content: "";
+            font-size: 20px;
+            text-align: left;
+        }
+        .contents {
+            width: 980px;
+            min-height: 400px;
+            padding-top: 20px;
+            margin-bottom:50px
+        }
+        .layout {
+            padding: 30px 200px 0;
+        }
+        th {
+            font-weight: bold;
+            width: 170px;
+        }
+        table {
+            color: #333333;
+            font-size: 12px;
+            line-height: 1.5;
+            display: table;
+            border-collapse: separate;
+            box-sizing: border-box;
+            border-color: grey;
+            width: 100%;
+        }
+        .bdCell {
+            border-top: 1px solid #CCCCCC;
+            border-left: 1px solid #CCCCCC;
+            margin-top:2px
+
+        }
+        .bdCell th, .bdCell td {
+            border-right: 1px solid #CCCCCC;
+            border-bottom: 1px solid #CCCCCC;
+            border-left: 1px solid #FFFFFF;
+            border-top: 1px solid #FFFFFF;
+        }
+        .bkColor3 {
+            background-color: #EEEBE4;
+        }
+        .bkColor {
+            background-color: #F2F2F2;
+        }
+        tr {
+            display: table-row;
+            vertical-align: inherit;
+            border-color: inherit;
+        }
+        td {
+            display: table-cell;
+            vertical-align: inherit;
+        }
+        tbody {
+            display: table-row-group;
+            vertical-align: middle;
+            border-color: inherit;
+        }
+        .divBL {
+            display: inline-block !important;
+            zoom: 1;
+        }
+        .bdCell th, .bdCell td {
+            padding: 5px;
+        }
+        .confirm_button {
+            cursor: pointer;
+            background-position: -1380px -680px;
+            width: 150px;
+            height: 50px;
+            background: #F95A6B;
+            border: 1px solid #DA949B;
+            border-radius: 4px;
+            box-shadow: inset 1px 1px 3px #F9D8DB, inset -1px -1px 3px #FFA6AE;
+            color: #FFFFFF !important;
+            padding: 1px;
+            margin: 10px 250px 30px;
+        
+        }
+        
+    </style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+    <script>
+        $('input').focusout(function(){
+            var usepoint = $(this).val();
+            var ogrinpoint = '{{ user.point }}';
+            var menuPrice = '{{ menu.price }}';
+            var pattern = /^\d*$/;
+	
+            if (pattern.test(usepoint) && Number(usepoint) <= ogrinpoint) {
+                $("#paymentAmount").text('¥' + Number(menuPrice - usepoint).toLocaleString());
+            } else {
+                $(this).val('');
+                $("#paymentAmount").text('¥' + Number(menuPrice).toLocaleString());
+            }
+        });
+
+    </script>
+{% endblock javascript %}
+
+{% block main %}
+<form name="reservation_form" method="post" action="{{ url('reservation_confirm') }}">
+{{ form_widget(form._token) }}
+{% if app.request.get('rsvDate') %}
+    <input type="hidden" name="starttime" value="{{ starttime }}">
+    <input type="hidden" name="menuId" value="{{ menu.id }}">
+    <input type="hidden" name="shopId" value="{{ shop.id }}">
+    {% if staff is not null %}
+    <input type="hidden" name="staffId" value="{{ staff.id }}">
+    {% endif %}
+{% endif %}
+<div class="contents">
+    <section>
+        <h2 class="title_page">{{ app.request.get('rsvDate') ? '予約確認' : '予約完了' }}</h2>
+    </section>
+    <section class="layout">
+        <div class="reserveTitleOuter">
+            <h3 class="reserveTitle">お客様情報</h3>
+        </div>
+        <div>
+            <table cellspacing="0" class="bdCell">
+            <tbody>
+				<tr>
+					<th class="bkColor">
+						<div class="divBL">ご予約者氏名</div>
+					</th>
+					<td>
+						<div>{{ user.name01 }}&nbsp;{{ user.name02 }}</div>
+					</td>
+				</tr>
+				<tr>
+					<th class="bkColor3">
+					    <div class="divBL">電話番号</div>
+					</th>
+					<td>
+                        <div>
+                            {{ user.phone_number }}
+                        </div>
+                    </td>
+				</tr>
+                </tbody>
+			</table>
+        </div>
+
+        <div class="reserveTitleOuter">
+            <h3 class="reserveTitle">予約情報</h3>
+        </div>
+        <div>
+            <table cellspacing="0" class="bdCell">
+            <tbody>
+				<tr>
+					<th class="bkColor">
+						<div class="divBL">メニュー</div>
+					</th>
+					<td>
+						<div>{{ menu.title }}</div>
+					</td>
+				</tr>
+				<tr>
+					<th class="bkColor3">
+					    <div class="divBL">合計金額</div>
+					</th>
+					<td>
+                        <div>
+                            {{ menu.price|price }}
+                        </div>
+                    </td>
+				</tr>
+                {% if staff is not null %}
+                <tr>
+					<th class="bkColor3">
+					    <div class="divBL">スタッフ</div>
+					</th>
+					<td>
+                        <div>
+                            {{ staff.name }}
+                        </div>
+                    </td>
+				</tr>
+                {% endif %}
+                </tbody>
+			</table>
+        </div>
+
+         <div class="reserveTitleOuter">
+            <h3 class="reserveTitle">ご利用ポイント情報</h3>
+        </div>
+        <div>
+            <table cellspacing="0" class="bdCell">
+            <tbody>
+				<tr>
+					<th class="bkColor">
+						<div class="divBL">ご利用可能ポイント</div>
+					</th>
+					<td>
+						<div>{{ user.point }}&nbsp;ポイント</div>
+					</td>
+				</tr>
+				<tr>
+					<th class="bkColor3">
+					    <div class="divBL">ご利用ポイント</div>
+					</th>
+					<td>
+                        <div>
+                        {% if app.request.get('rsvDate') %}
+                            {{ form_widget(form.point ,{attr: { style : 'width:200px;' }} ) }}
+                            {{ form_errors(form.point) }}
+                        {% else %}
+                            {{ Reservation.point is not null ? Reservation.point : 0 }}&nbsp;ポイント
+                        {% endif %}
+                        </div>
+                    </td>
+				</tr>
+                <tr>
+                <th class="bkColor3">
+					    <div class="divBL">お支払い予定金額<br><span>（合計金額 - ご利用ポイント分）</span></div>
+					</th>
+					<td>
+                        <div>
+                            <span id="paymentAmount">{{ app.request.get('rsvDate') ? menu.price|price : (menu.price - Reservation.point)|price }}</span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+			</table>
+        </div>
+
+        <div class="reserveTitleOuter">
+            <h3 class="reserveTitle">ご要望・ご相談</h3>
+        </div>
+        <div>
+            <table cellspacing="0" class="bdCell">
+            <tbody>
+				<tr>
+					<td>
+						<div>
+                            {{ form_widget(form.memo) }}
+                            {{ form_errors(form.memo) }}
+                        </div>
+					</td>
+				</tr>
+                </tbody>
+			</table>
+            {% if app.request.get('rsvDate') %}
+            <input type="submit" name="confirm" value="予約内容を確認する" class="confirm_button" title="予約内容を確認する" /></div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+</form>
+{% endblock %}

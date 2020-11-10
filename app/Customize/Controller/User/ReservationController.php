@@ -13,9 +13,11 @@
 
 namespace Customize\Controller\User;
 
-use Customize\Entity\Menu;
-use Customize\Entity\Shop;
+use Customize\Entity\Reservation;
+use Customize\Form\Type\Admin\ReservationType;
+use Eccube\Repository\CustomerRepository;
 use Customize\Repository\MenuRepository;
+use Customize\Repository\ReservationRepository;
 use Customize\Repository\ShopRepository;
 use Customize\Repository\StaffRepository;
 use Eccube\Controller\AbstractController;
@@ -30,22 +32,29 @@ class ReservationController extends AbstractController
 {
     /**
      * @var EncoderFactoryInterface
+     * @var CustomerRepository
      */
     protected $encoderFactory;
     protected $staffRepository;
     protected $shopRepository;
     protected $menuRepository;
+    protected $reservationRepository;
+    protected $customerRepository;
 
     public function __construct(
         EncoderFactoryInterface $encoderFactory,
 		StaffRepository $staffRepository,
 		ShopRepository $shopRepository,
-		MenuRepository $menuRepository
+        MenuRepository $menuRepository,
+        ReservationRepository $reservationRepository,
+        CustomerRepository $customerRepository
     ) {
         $this->encoderFactory = $encoderFactory;
         $this->staffRepository = $staffRepository;
         $this->shopRepository = $shopRepository;
         $this->menuRepository = $menuRepository;
+        $this->reservationRepository = $reservationRepository;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -61,11 +70,11 @@ class ReservationController extends AbstractController
     		throw new NotFoundHttpException();
 	    }
 
-    	$store_id = $shop->getHotpepperStoreId();
-    	$menu_id = $menu->getHotpepperMenuId();
+    	$storeId = $shop->getHotpepperStoreId();
+    	$menuId = $menu->getHotpepperMenuId();
 
     	// "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=H000116656&menuId=MN00000003717887&add=0&addMenu=0&rootCd=10"
-        $url = "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=" . $store_id . "&menuId=" . $menu_id . "&addMenu=0&rootCd=10";
+        $url = "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=" . $storeId . "&menuId=" . $menuId . "&addMenu=0&rootCd=10";
 
         $ch = curl_init();
         
@@ -123,6 +132,66 @@ class ReservationController extends AbstractController
         return [
             'content' => $output,
             'Staffs' => $outputStaff,
+            'shop_id' => $shop_id,
+            'menu_id' => $menu_id
+        ];
+    }
+
+    /**
+     * @Route("/reservation/confirm", name="reservation_confirm")
+     * @Template("@user_data/Reservation/confirm.twig")
+     */
+    public function confirm(Request $request)
+    {
+        $Reservation = new Reservation();
+        if (!is_null($request->get('reservationId'))) {
+            $Reservation = $this->reservationRepository->find($request->get('reservationId')); 
+        }
+        $starttime = $request->get('rsvDate'). $request->get('rsvTime');
+        $menu = $this->menuRepository->find($request->get('menuId')); 
+        $shop = $this->shopRepository->find($request->get('shopId'));
+        $staff = !is_null($request->get('staffId')) ? $this->staffRepository->find($request->get('staffId')) : null;
+        
+        // todo user
+        $user = $this->customerRepository->find(2);
+        if(!$user || !$menu || !$shop) {
+            throw new NotFoundHttpException();
+        }
+        
+        $builder = $this->formFactory->createBuilder(ReservationType::class, $Reservation);
+        $form = $builder->getForm();
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $Reservation = $form->getData();
+            $Reservation->setCreatedAt(new \DateTime());
+            $Reservation->setStarttime($request->get('starttime'));
+            $Reservation->setStatus(2); // 予約済
+            $Reservation->setPointSumBeforeReservation($user->getPoint());
+            $Reservation->setCustomer($user);
+            $Reservation->setMenu($menu);
+            $Reservation->setShopId($request->get('shopId'));
+            $Reservation->setStaff($staff);
+            
+            $this->reservationRepository->save($Reservation);
+            
+            $this->addSuccess('admin.common.save_complete', 'admin');
+            log_info('予約情報登録完了', [$Reservation->getId()]);
+            return $this->redirectToRoute('reservation_confirm',[
+                'menuId' => $request->get('menuId'),
+                'shopId' => $request->get('shopId'),
+                'reservationId' => $Reservation->getId()
+            ]);
+        }
+        return [
+            'staff' => $staff,
+            'menu' => $menu,
+            'shop' => $shop,
+            'user' => $user,
+            'starttime' => $starttime,
+            'form' => $form->createView(),
+            'Reservation' => $Reservation
         ];
     }
 
