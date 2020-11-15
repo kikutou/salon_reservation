@@ -146,16 +146,16 @@ class ReservationController extends AbstractController
      */
     public function confirm(Request $request)
     {
-        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
-            return $this->redirectToRoute('mypage_login');
-        } else {
-           // $user = $this->tokenStorage->getToken()->getUser();
-            $user = $this->customerRepository->find(2);
+
+	    $user = $this->getUser();
+        if(!$user) {
+	        return $this->redirectToRoute('mypage_login');
+
         }
 
         $Reservation = new Reservation();
         if (!is_null($request->get('reservationId'))) {
-            $Reservation = $this->reservationRepository->find($request->get('reservationId')); 
+            $Reservation = $this->reservationRepository->find($request->get('reservationId'));
         }
         $starttime = $request->get('rsvDate'). $request->get('rsvTime');
         $menu = $this->menuRepository->find($request->get('menuId')); 
@@ -238,14 +238,9 @@ class ReservationController extends AbstractController
                     ]
                 );
             } catch (\Exception $e) {
-                throw new NotFoundHttpException();
+                throw new \Exception("予約情報の発信は失敗になりました。");
             }
 
-//            return $this->redirectToRoute('reservation_confirm',[
-//                'menuId' => $request->get('menuId'),
-//                'shopId' => $request->get('shopId'),
-//                'reservationId' => $Reservation->getId()
-//            ]);
 	        return $this->redirectToRoute("reservation_finish", [
 	        	"id" => $Reservation->getId()
 	        ]);
