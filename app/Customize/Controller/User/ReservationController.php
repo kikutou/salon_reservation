@@ -194,7 +194,6 @@ class ReservationController extends AbstractController
             // A Twilio number you own with SMS capabilities
             $twilio_number = env('TWILIO_NUMBER');
             $shop_number = '+81'. substr($shop->getTelephone(), 1);
-            $shop_number = "+81" . "08048831015";
 
             // テキストからmp3に変換
             $credentials = new Credentials(
