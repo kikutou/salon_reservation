@@ -178,11 +178,14 @@ class ReservationController extends AbstractController
             
             $this->addSuccess('admin.common.save_complete', 'admin');
             log_info('予約情報登録完了', [$Reservation->getId()]);
-            return $this->redirectToRoute('reservation_confirm',[
-                'menuId' => $request->get('menuId'),
-                'shopId' => $request->get('shopId'),
-                'reservationId' => $Reservation->getId()
-            ]);
+//            return $this->redirectToRoute('reservation_confirm',[
+//                'menuId' => $request->get('menuId'),
+//                'shopId' => $request->get('shopId'),
+//                'reservationId' => $Reservation->getId()
+//            ]);
+	        return $this->redirectToRoute("reservation_finish", [
+	        	"id" => $Reservation->getId()
+	        ]);
         }
         return [
             'staff' => $staff,
@@ -193,6 +196,18 @@ class ReservationController extends AbstractController
             'form' => $form->createView(),
             'Reservation' => $Reservation
         ];
+    }
+
+	/**
+	 * @Route("/reservation/finish/{id}", name="reservation_finish")
+	 * @Template("@user_data/Reservation/finish.twig")
+	 */
+    public function finish(Request $request, Reservation $reservation)
+    {
+
+	    return [
+		    'reservation' => $reservation
+	    ];
     }
 
    

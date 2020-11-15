@@ -123,39 +123,12 @@ file that was distributed with this source code.
     </style>
 {% endblock stylesheet %}
 
-{% block javascript %}
-    <script>
-        $('input').focusout(function(){
-            var usepoint = $(this).val();
-            var ogrinpoint = '{{ user.point }}';
-            var menuPrice = '{{ menu.price }}';
-            var pattern = /^\d*$/;
-	
-            if (pattern.test(usepoint) && Number(usepoint) <= ogrinpoint) {
-                $("#paymentAmount").text('¥' + Number(menuPrice - usepoint).toLocaleString());
-            } else {
-                $(this).val('');
-                $("#paymentAmount").text('¥' + Number(menuPrice).toLocaleString());
-            }
-        });
-
-    </script>
-{% endblock javascript %}
-
 {% block main %}
-<form name="reservation_form" method="post" action="{{ url('reservation_confirm') }}">
-{{ form_widget(form._token) }}
-{% if app.request.get('rsvDate') %}
-    <input type="hidden" name="starttime" value="{{ starttime }}">
-    <input type="hidden" name="menuId" value="{{ menu.id }}">
-    <input type="hidden" name="shopId" value="{{ shop.id }}">
-    {% if staff is not null %}
-    <input type="hidden" name="staffId" value="{{ staff.id }}">
-    {% endif %}
-{% endif %}
+
+
 <div class="contents">
     <section>
-        <h2 class="title_page">{{ app.request.get('rsvDate') ? '予約確認' : '予約完了' }}</h2>
+        <h2 class="title_page">予約完了</h2>
     </section>
     <section class="layout">
         <div class="reserveTitleOuter">
@@ -169,7 +142,7 @@ file that was distributed with this source code.
 						<div class="divBL">ご予約者氏名</div>
 					</th>
 					<td>
-						<div>{{ user.name01 }}&nbsp;{{ user.name02 }}</div>
+						<div>{{ reservation.customer.name01 }}&nbsp;{{ reservation.customer.name02 }}</div>
 					</td>
 				</tr>
 				<tr>
@@ -178,7 +151,7 @@ file that was distributed with this source code.
 					</th>
 					<td>
                         <div>
-                            {{ user.phone_number }}
+                            {{ reservation.customer.phone_number }}
                         </div>
                     </td>
 				</tr>
@@ -197,7 +170,7 @@ file that was distributed with this source code.
 						<div class="divBL">メニュー</div>
 					</th>
 					<td>
-						<div>{{ menu.title }}</div>
+						<div>{{ reservation.menu.title }}</div>
 					</td>
 				</tr>
 				<tr>
@@ -206,18 +179,18 @@ file that was distributed with this source code.
 					</th>
 					<td>
                         <div>
-                            {{ menu.price }}
+                            {{ reservation.menu.price }}
                         </div>
                     </td>
 				</tr>
-                {% if staff is not null %}
+                {% if reservation.staff is not null %}
                 <tr>
 					<th class="bkColor3">
 					    <div class="divBL">スタッフ</div>
 					</th>
 					<td>
                         <div>
-                            {{ staff.name }}
+                            {{ reservation.staff.name }}
                         </div>
                     </td>
 				</tr>
@@ -278,22 +251,15 @@ file that was distributed with this source code.
 				<tr>
 					<td>
 						<div>
-                            {% if app.request.get('rsvDate') %}
-                            {{ form_widget(form.memo) }}
-                            {{ form_errors(form.memo) }}
-                            {% else %}
 
-                                {{ Reservation.memo }}
+                            {{ reservation.memo }}
 
-                            {% endif %}
+
                         </div>
 					</td>
 				</tr>
                 </tbody>
 			</table>
-            {% if app.request.get('rsvDate') %}
-            <input type="submit" name="confirm" value="予約内容を確認する" class="confirm_button" title="予約内容を確認する" /></div>
-            {% endif %}
         </div>
     </section>
 </div>
