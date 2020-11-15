@@ -188,21 +188,21 @@ class ReservationController extends AbstractController
             log_info('予約情報登録完了', [$Reservation->getId()]);
 
             // Twilio アカウント情報
-            $account_sid = 'AC148ced6e8aa1ac9298f91e04724c7329';
-            $auth_token = '4dacef2ef850230ef72afc1af8e94594';
+            $account_sid = env('TWILIO_SID');
+            $auth_token = env('TWILIO_TOKEN');
 
             // A Twilio number you own with SMS capabilities
-            $twilio_number = "+13158093857";
+            $twilio_number = env('TWILIO_NUMBER');
             $shop_number = '+81'. substr($shop->getTelephone(), 1);
 
             // テキストからmp3に変換
             $credentials = new Credentials(
-                'AKIA4WTYE2RBML4WHKGI',
-                'YT34PRSPv9sDr8GyYLNdfo0znkPuRUyiPce1Zg7C');
+                env('AWS_KEY'),
+                env('AWS_SECRET_KEY'));
     
             $client = new PollyClient([
-                'region' => 'ap-northeast-1',
-                'version' => 'latest',
+                'region' => env('AWS_REGION'),
+                'version' => env('AWS_VERSION'),
                 'credentials' => $credentials
             ]);
 
