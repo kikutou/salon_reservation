@@ -212,11 +212,11 @@ class ReservationController extends AbstractController
                 'VoiceId' => 'Mizuki',
             ]);
     
-            $voice_path = $this->eccubeConfig['eccube_temp_image_dir'].'/rev_call.mp3';
+            $voice_path = $this->eccubeConfig['eccube_temp_image_dir'] . '/rev_call.mp3';
     
             // mp3生成
             file_put_contents($voice_path, $result['AudioStream']);
-            $voiceUrl = $request->getBaseUrl() . $voice_path;
+            $voiceUrl = $request->getUriForPath('/html/upload/temp_image') . '/rev_call.mp3';
 
             try {
                  $client = new Client($account_sid, $auth_token);
