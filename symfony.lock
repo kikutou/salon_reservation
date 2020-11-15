@@ -1,4 +1,7 @@
 {
+    "aws/aws-sdk-php": {
+        "version": "3.161.1"
+    },
     "behat/gherkin": {
         "version": "v4.5.1"
     },
@@ -175,6 +178,9 @@
     },
     "monolog/monolog": {
         "version": "1.23.0"
+    },
+    "mtdowling/jmespath.php": {
+        "version": "2.6.0"
     },
     "myclabs/deep-copy": {
         "version": "1.7.0"

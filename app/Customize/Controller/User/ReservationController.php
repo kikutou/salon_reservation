@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Aws\Credentials\Credentials;
+use Aws\Polly\PollyClient;
 
 
 class ReservationController extends AbstractController
@@ -147,7 +149,8 @@ class ReservationController extends AbstractController
         if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
             return $this->redirectToRoute('mypage_login');
         } else {
-            $user = $this->tokenStorage->getToken()->getUser();
+           // $user = $this->tokenStorage->getToken()->getUser();
+            $user = $this->customerRepository->find(2);
         }
 
         $Reservation = new Reservation();
@@ -191,10 +194,32 @@ class ReservationController extends AbstractController
             // A Twilio number you own with SMS capabilities
             $twilio_number = "+13158093857";
             $shop_number = '+81'. substr($shop->getTelephone(), 1);
-            $vedioUrl = 'xxxxxx'; // todo
+
+            // テキストからmp3に変換
+            $credentials = new Credentials(
+                'AKIA4WTYE2RBML4WHKGI',
+                'YT34PRSPv9sDr8GyYLNdfo0znkPuRUyiPce1Zg7C');
+    
+            $client = new PollyClient([
+                'region' => 'ap-northeast-1',
+                'version' => 'latest',
+                'credentials' => $credentials
+            ]);
+
+            $result = $client->synthesizeSpeech([
+                'Text' => '予約を取りました。',
+                'OutputFormat' => 'mp3',
+                'VoiceId' => 'Mizuki',
+            ]);
+    
+            $voice_path = $this->eccubeConfig['eccube_temp_image_dir'].'/rev_call.mp3';
+    
+            // mp3生成
+            file_put_contents($voice_path, $result['AudioStream']);
+            $voiceUrl = $request->getBaseUrl() . $voice_path;
 
             try {
-                $client = new Client($account_sid, $auth_token);
+                 $client = new Client($account_sid, $auth_token);
                 $client->messages->create(
                     // メッセージ
                     $shop_number,
@@ -209,7 +234,7 @@ class ReservationController extends AbstractController
                     $shop_number,
                     $twilio_number,
                     [
-                        'twiml' => '<Response><Play>'. $vedioUrl . '</Play></Response>'
+                        'twiml' => '<Response><Play>'. $voiceUrl . '</Play></Response>'
                     ]
                 );
             } catch (\Exception $e) {
