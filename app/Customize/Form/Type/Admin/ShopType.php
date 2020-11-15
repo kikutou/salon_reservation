@@ -159,6 +159,9 @@ class ShopType extends AbstractType
             ->add('url', UrlType::class, [
                 'required' => false,
             ])
+            ->add('map', TextareaType::class, [
+                'required' => false,
+            ])
             ->add('question', TextType::class, [
                 'required' => false,
             ])

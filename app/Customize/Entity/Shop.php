@@ -124,7 +124,14 @@ class Shop extends \Eccube\Entity\AbstractEntity
      *
      * @ORM\Column(name="url", type="text", length=65535, nullable=true)
      */
-    private $url;
+	private $url;
+	
+	/**
+     * @var string|null
+     *
+     * @ORM\Column(name="map", type="text", length=65535, nullable=true)
+     */
+    private $map;
 
     /**
      * @var string|null
@@ -622,6 +629,22 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public function setUrl(?string $url): void
 	{
 		$this->url = $url;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getMap(): ?string
+	{
+		return $this->map;
+	}
+
+	/**
+	 * @param null|string $map
+	 */
+	public function setMap(?string $map): void
+	{
+		$this->map = $map;
 	}
 
 	/**

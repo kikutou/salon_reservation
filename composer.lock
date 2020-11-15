@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26d5cd98f0123a682f18d802228af345",
+    "content-hash": "28424e34e345d547992c4fc617486ec5",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1636,6 +1636,7 @@
             "keywords": [
                 "reflection"
             ],
+            "abandoned": "roave/better-reflection",
             "time": "2018-06-14T14:45:07+00:00"
         },
         {
@@ -8225,6 +8226,7 @@
                 "i18n",
                 "text"
             ],
+            "abandoned": true,
             "time": "2018-12-05T18:34:18+00:00"
         },
         {
@@ -8293,6 +8295,56 @@
                 "templating"
             ],
             "time": "2019-11-11T16:52:09+00:00"
+        },
+        {
+            "name": "twilio/sdk",
+            "version": "6.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twilio/twilio-php.git",
+                "reference": "8649f40db24f074a66e3f762b11079be31cfdb8b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/8649f40db24f074a66e3f762b11079be31cfdb8b",
+                "reference": "8649f40db24f074a66e3f762b11079be31cfdb8b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^6.3 || ^7.0",
+                "phpunit/phpunit": ">=4.5",
+                "theseer/phpdox": "^0.12.0"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "An HTTP client to execute the API requests"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Twilio\\": "src/Twilio/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Twilio API Team",
+                    "email": "api@twilio.com"
+                }
+            ],
+            "description": "A PHP wrapper for Twilio's API",
+            "homepage": "http://github.com/twilio/twilio-php",
+            "keywords": [
+                "api",
+                "sms",
+                "twilio"
+            ],
+            "time": "2020-11-05T21:49:26+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -10624,6 +10676,7 @@
     "platform": {
         "php": "^7.1.3",
         "ext-intl": "*",
+        "ext-json": "*",
         "ext-mbstring": "*"
     },
     "platform-dev": [],

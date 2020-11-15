@@ -24,7 +24,7 @@ class Reservation extends \Eccube\Entity\AbstractEntity
     /**
      * @var int
      *
-     * @ORM\Column(name="order_id", type="integer", nullable=false)
+     * @ORM\Column(name="order_id", type="integer", nullable=true)
      */
     private $orderId;
 
@@ -196,18 +196,18 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	}
 
 	/**
-	 * @return int
+	 * @return null|int
 	 */
-	public function getOrderId(): int
+	public function getOrderId(): ?int
 	{
 		return $this->orderId;
 	}
 
 	/**
-	 * @param int $orderId
+	 * @param null|int $orderId
 	 * @return self
 	 */
-	public function setOrderId(int $orderId): self
+	public function setOrderId(?int $orderId): self
 	{
 		$this->orderId = $orderId;
 		return $this;

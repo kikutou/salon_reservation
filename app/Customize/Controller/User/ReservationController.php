@@ -13,6 +13,7 @@
 
 namespace Customize\Controller\User;
 
+use Twilio\Rest\Client;
 use Customize\Entity\Reservation;
 use Customize\Form\Type\Admin\ReservationType;
 use Eccube\Repository\CustomerRepository;
@@ -143,6 +144,12 @@ class ReservationController extends AbstractController
      */
     public function confirm(Request $request)
     {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('mypage_login');
+        } else {
+            $user = $this->tokenStorage->getToken()->getUser();
+        }
+
         $Reservation = new Reservation();
         if (!is_null($request->get('reservationId'))) {
             $Reservation = $this->reservationRepository->find($request->get('reservationId')); 
@@ -152,8 +159,6 @@ class ReservationController extends AbstractController
         $shop = $this->shopRepository->find($request->get('shopId'));
         $staff = !is_null($request->get('staffId')) ? $this->staffRepository->find($request->get('staffId')) : null;
         
-        // todo user
-        $user = $this->customerRepository->find(2);
         if(!$user || !$menu || !$shop) {
             throw new NotFoundHttpException();
         }
@@ -178,6 +183,39 @@ class ReservationController extends AbstractController
             
             $this->addSuccess('admin.common.save_complete', 'admin');
             log_info('予約情報登録完了', [$Reservation->getId()]);
+
+            // Twilio アカウント情報
+            $account_sid = 'AC148ced6e8aa1ac9298f91e04724c7329';
+            $auth_token = '4dacef2ef850230ef72afc1af8e94594';
+
+            // A Twilio number you own with SMS capabilities
+            $twilio_number = "+13158093857";
+            $shop_number = '+81'. substr($shop->getTelephone(), 1);
+            $vedioUrl = 'xxxxxx'; // todo
+
+            try {
+                $client = new Client($account_sid, $auth_token);
+                $client->messages->create(
+                    // メッセージ
+                    $shop_number,
+                    [
+                        'from' => $twilio_number,
+                        'body' => '予約を取りました。'
+                    ]
+                );
+
+                $client->calls->create(
+                    // 電話
+                    $shop_number,
+                    $twilio_number,
+                    [
+                        'twiml' => '<Response><Play>'. $vedioUrl . '</Play></Response>'
+                    ]
+                );
+            } catch (\Exception $e) {
+                throw new NotFoundHttpException();
+            }
+
 //            return $this->redirectToRoute('reservation_confirm',[
 //                'menuId' => $request->get('menuId'),
 //                'shopId' => $request->get('shopId'),
