@@ -194,6 +194,7 @@ class ReservationController extends AbstractController
             // A Twilio number you own with SMS capabilities
             $twilio_number = "+13158093857";
             $shop_number = '+81'. substr($shop->getTelephone(), 1);
+            $shop_number = "+81" . "08048831015";
 
             // テキストからmp3に変換
             $credentials = new Credentials(
@@ -216,10 +217,15 @@ class ReservationController extends AbstractController
     
             // mp3生成
             file_put_contents($voice_path, $result['AudioStream']);
-            $voiceUrl = $request->getBaseUrl() . $voice_path;
+
+            $voiceUrl = ($request->isSecure() ? "https://" : "http://") . $request->getHost() . "/html/upload/temp_image/rev_call.mp3";
+
+
+//            exit(var_dump($voiceUrl));
 
             try {
-                 $client = new Client($account_sid, $auth_token);
+
+            	$client = new Client($account_sid, $auth_token);
                 $client->messages->create(
                     // メッセージ
                     $shop_number,
@@ -238,6 +244,8 @@ class ReservationController extends AbstractController
                     ]
                 );
             } catch (\Exception $e) {
+
+            	exit(var_dump($e));
                 throw new \Exception("予約情報の発信は失敗になりました。");
             }
 
