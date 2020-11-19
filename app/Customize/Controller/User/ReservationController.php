@@ -26,6 +26,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Aws\Credentials\Credentials;
 use Aws\Polly\PollyClient;
@@ -195,29 +196,29 @@ class ReservationController extends AbstractController
             $twilio_number = env('TWILIO_NUMBER');
             $shop_number = '+81'. substr($shop->getTelephone(), 1);
 
-            // テキストからmp3に変換
-            $credentials = new Credentials(
-                env('AWS_KEY'),
-                env('AWS_SECRET_KEY'));
+            // // テキストからmp3に変換
+            // $credentials = new Credentials(
+            //     env('AWS_KEY'),
+            //     env('AWS_SECRET_KEY'));
     
-            $client = new PollyClient([
-                'region' => env('AWS_REGION'),
-                'version' => env('AWS_VERSION'),
-                'credentials' => $credentials
-            ]);
+            // $client = new PollyClient([
+            //     'region' => env('AWS_REGION'),
+            //     'version' => env('AWS_VERSION'),
+            //     'credentials' => $credentials
+            // ]);
 
-            $result = $client->synthesizeSpeech([
-                'Text' => '予約を取りました。',
-                'OutputFormat' => 'mp3',
-                'VoiceId' => 'Mizuki',
-            ]);
+            // $result = $client->synthesizeSpeech([
+            //     'Text' => '予約を取りました。',
+            //     'OutputFormat' => 'mp3',
+            //     'VoiceId' => 'Mizuki',
+            // ]);
     
-            $voice_path = $this->eccubeConfig['eccube_temp_image_dir'] . '/rev_call.mp3';
+            // $voice_path = $this->eccubeConfig['eccube_temp_image_dir'] . '/rev_call.mp3';
     
-            // mp3生成
-            file_put_contents($voice_path, $result['AudioStream']);
+            // // mp3生成
+            // file_put_contents($voice_path, $result['AudioStream']);
 
-            $voiceUrl = ($request->isSecure() ? "https://" : "http://") . $request->getHost() . "/html/upload/temp_image/rev_call.mp3";
+            $voiceUrl = ($request->isSecure() ? "https://" : "http://") . $request->getHost() . "/reservation/call";
 
             try {
 
@@ -236,7 +237,7 @@ class ReservationController extends AbstractController
                     $shop_number,
                     $twilio_number,
                     [
-                        'twiml' => '<Response><Play>'. $voiceUrl . '</Play></Response>'
+                        'url' => $voiceUrl
                     ]
                 );
             } catch (\Exception $e) {
@@ -273,5 +274,12 @@ class ReservationController extends AbstractController
     }
 
    
-   
+    /**
+     * @Route("/reservation/call", name="reservation_call")
+     * @Template("@call.xml")
+     */
+    public function rsvCall(Request $request)
+    {
+        return new Response($this->renderView('call.xml'));
+    }
 }

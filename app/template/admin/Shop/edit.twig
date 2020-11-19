@@ -19,7 +19,16 @@ file that was distributed with this source code.
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 
 {% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/tempusdominus-bootstrap-4.min.css', 'admin') }}">
     <style>
+        .datepicker-days th.dow:first-child,
+        .datepicker-days td:first-child {
+            color: #f00;
+        }
+        .datepicker-days th.dow:last-child,
+        .datepicker-days td:last-child {
+            color: #00f;
+        }
         .delete-image {
             margin-left: 5px;
         }
@@ -51,6 +60,7 @@ file that was distributed with this source code.
         $(document).on('drop dragover', function(e) {
             e.preventDefault();
         });
+        
         $(function() {
             var confirmFormChange = function(form, target, modal) {
                 var returnLink = form.find('input[type="hidden"][name*="return_link"]'),
@@ -74,6 +84,32 @@ file that was distributed with this source code.
             };
 
             confirmFormChange($('#form1'), $('a[data-action="confirm"]'), $('#confirmFormChangeModal'))
+
+            $.when(
+                $.getScript("{{ asset('assets/js/vendor/moment.min.js', 'admin') }}"),
+                $.getScript("{{ asset('assets/js/vendor/moment-with-locales.min.js', 'admin') }}"),
+                $.getScript("{{ asset('assets/js/vendor/tempusdominus-bootstrap-4.min.js', 'admin') }}")
+            ).done(function() {
+                // datetimepicker で value が消えてしまうので data-value に保持しておく
+                $('input.datetimepicker-input').each(function() {
+                    $(this).data('value', $(this).val());
+                });
+
+                $('input.datetimepicker-input').datetimepicker({
+                    locale: '{{ eccube_config.locale }}',
+                    format: 'YYYY/MM/DD',
+                    useCurrent: false,
+                    buttons: {
+                        showToday: true,
+                        showClose: true
+                    },
+                });
+
+                // datetimepicker で value が消えてしまうので更新
+                $('input.datetimepicker-input').each(function() {
+                    $(this).val($(this).data('value'));
+                });
+            });
         });
 
         var delete_images = []
@@ -1094,6 +1130,24 @@ file that was distributed with this source code.
                                                 <a class="btn btn-ec-regular mr-2" onclick="$('#admin_shop_messageImage').click()">
                                                     {{ 'admin.common.file_select'|trans }}
                                                 </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-3">
+                                        <span>有効期限</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_widget(form.expire_date) }}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                {{ form_errors(form.expire_date) }}
                                             </div>
                                         </div>
                                     </div>

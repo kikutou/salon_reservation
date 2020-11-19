@@ -26,6 +26,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -315,6 +316,17 @@ class ShopType extends AbstractType
                     new Assert\Length([
                         'max' => $this->eccubeConfig['eccube_ltext_len'],
                     ]),
+                ],
+            ])
+            ->add('expire_date', DateType::class, [
+                'input' => 'datetime',
+                'widget' => 'single_text',
+                'format' => 'yyyy/MM/dd',
+                'required' => false,
+                'attr' => [
+                    'class' => 'datetimepicker-input',
+                    'data-target' => '#'.$this->getBlockPrefix().'_expire_date',
+                    'data-toggle' => 'datetimepicker',
                 ],
             ]);
     }

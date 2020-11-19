@@ -153,6 +153,7 @@ class ShopController extends AbstractController
 
 			if($shop->getAuthenticatedByAdmin() != 2) {
 				$shop->setAuthenticatedByAdmin(2);
+				$shop->setExpireDate(new \DateTime(date('Y/m/d', strtotime('+1 year'))));
 
 				$Work = $this->entityManager->find(\Eccube\Entity\Master\Work::class, 1);
 				$member = $this->memberRepository->find($shop->getMemberId())->setWork($Work);

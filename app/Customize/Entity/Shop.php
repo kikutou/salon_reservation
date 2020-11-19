@@ -404,7 +404,14 @@ class Shop extends \Eccube\Entity\AbstractEntity
      *
      * @ORM\Column(name="memo", type="text", length=65535, nullable=true)
      */
-    private $memo;
+	private $memo;
+	
+	/**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="expire_date", type="date", nullable=true)
+     */
+    private $expireDate;
 
     /**
      * @var \DateTime|null
@@ -1283,6 +1290,22 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public function setMemo(?string $memo): void
 	{
 		$this->memo = $memo;
+	}
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function getExpireDate(): ?\DateTime
+	{
+		return $this->expireDate;
+	}
+
+	/**
+	 * @param DateTime|null $expireDate
+	 */
+	public function setExpireDate(?\DateTime $expireDate): void
+	{
+		$this->expireDate = $expireDate;
 	}
 
 	/**
