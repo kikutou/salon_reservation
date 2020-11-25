@@ -27,13 +27,18 @@ file that was distributed with this source code.
         };
 
         $(document).ready(function(){
+            var shop_id = {{ shop_id }};
+            var menu_id = {{ menu_id }};
             $("a.icnOpen").each(function(i,item){
-                var shop_id = {{ shop_id }};
-                var menu_id = {{ menu_id }};
                 var original_url = $(item).attr("href");
                 var rsvRequestDate = getUrlParameter(original_url, "rsvRequestDate1");
                 var rsvRequestTime = getUrlParameter(original_url, "rsvRequestTime1");
                 $(item).attr("href", "/reservation/confirm?shopId=" + shop_id + '&menuId=' + menu_id + '&rsvDate=' + rsvRequestDate + '&rsvTime=' + rsvRequestTime);
+            });
+            $(".weekPaging a").each(function(i,item){
+                var orig_url = $(item).attr("href");
+                var week = getUrlParameter(orig_url, "week");
+                $(item).attr("href", "/user/reservation/" + shop_id + '/' + menu_id + '/' + week);
             });
         });
 

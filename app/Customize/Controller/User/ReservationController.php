@@ -62,10 +62,10 @@ class ReservationController extends AbstractController
     }
 
     /**
-     * @Route("/user/reservation/{shop_id}/{menu_id}", name="user_reservation")
+     * @Route("/user/reservation/{shop_id}/{menu_id}/{week}", name="user_reservation_week")
      * @Template("@user_data/Reservation/index.twig")
      */
-    public function index(Request $request, string $shop_id, string $menu_id)
+    public function index(Request $request, string $shop_id, string $menu_id, $week = 0)
     {
 
     	$shop = $this->shopRepository->find($shop_id);
@@ -75,10 +75,10 @@ class ReservationController extends AbstractController
 	    }
 
     	$storeId = $shop->getHotpepperStoreId();
-    	$menuId = $menu->getHotpepperMenuId();
+        $menuId = $menu->getHotpepperMenuId();
 
-    	// "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=H000116656&menuId=MN00000003717887&add=0&addMenu=0&rootCd=10"
-        $url = "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=" . $storeId . "&menuId=" . $menuId . "&addMenu=0&rootCd=10";
+    	// "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=H000116656&menuId=MN00000003717887&addMenu=0&rootCd=10"
+        $url = "https://beauty.hotpepper.jp/CSP/bt/reserve/?storeId=" . $storeId . "&menuId=" . $menuId . "&addMenu=0&rootCd=10&week=". $week;
 
         $ch = curl_init();
         
@@ -107,8 +107,6 @@ class ReservationController extends AbstractController
         	throw new NotFoundHttpException($e->getMessage());
         }
         
-
-        
         foreach ($dateArray as $key => $date) {
             if ($key <= 13) {
                 $headerStr = substr($date, -38, 28);
@@ -117,8 +115,6 @@ class ReservationController extends AbstractController
             }
         }
         $output = str_replace('※来店日条件：指定なし', '', $output);
-
-
 
 
         // スタッフリスト
