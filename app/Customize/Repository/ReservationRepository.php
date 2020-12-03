@@ -13,6 +13,7 @@
 
 namespace Customize\Repository;
 
+use Twilio\Rest\Client;
 use Customize\Entity\Reservation;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -51,5 +52,90 @@ class ReservationRepository extends \Eccube\Repository\AbstractRepository
         $em = $this->getEntityManager();
         $em->persist($Reservation);
         $em->flush($Reservation);
+    }
+
+    /**
+     * @param $telephone 店舗の電話番号
+     * @param $Reservation 予約情報
+     * @param $rsv 予約true/キャンセルfalse
+     */
+    public function twilioSet($telephone, $Reservation, $rsv = false)
+    {
+        // Twilio アカウント情報
+        $account_sid = env('TWILIO_SID');
+        $auth_token = env('TWILIO_TOKEN');
+
+        // A Twilio number you own with SMS capabilities
+        $twilio_number = env('TWILIO_NUMBER');
+        $shop_number = '+81'. substr($telephone, 1);
+
+        // // テキストからmp3に変換
+        // $credentials = new Credentials(
+        //     env('AWS_KEY'),
+        //     env('AWS_SECRET_KEY'));
+
+        // $client = new PollyClient([
+        //     'region' => env('AWS_REGION'),
+        //     'version' => env('AWS_VERSION'),
+        //     'credentials' => $credentials
+        // ]);
+
+        // $result = $client->synthesizeSpeech([
+        //     'Text' => '予約を取りました。',
+        //     'OutputFormat' => 'mp3',
+        //     'VoiceId' => 'Mizuki',
+        // ]);
+
+        // $voice_path = $this->eccubeConfig['eccube_temp_image_dir'] . '/rev_call.mp3';
+
+        // // mp3生成
+        // file_put_contents($voice_path, $result['AudioStream']);
+
+        // $voiceUrl = ($request->isSecure() ? "https://" : "http://") . $request->getHost() . "/reservation/call";
+
+
+        try {
+
+            $client = new Client($account_sid, $auth_token);
+            $client->messages->create(
+                // メッセージ
+                $shop_number,
+                [
+                    'from' => $twilio_number,
+                    'body' => $this->getMailBody($Reservation, $rsv)
+                ]
+            );
+
+            $client->calls->create(
+                // 電話
+                $shop_number,
+                $twilio_number,
+                [
+                    //'url' => $voiceUrl
+                    'twiml' => ''// todo
+                ]
+            );
+        } catch (\Exception $e) {
+
+            exit(var_dump($e));
+            throw new \Exception("予約情報の発信は失敗になりました。");
+        }
+    }
+
+    // メール本文
+    public function getMailBody($Reservation, $rsv)
+    {
+        $body = [
+            '【Re:Rose】来店'. (!$rsv ? 'キャンセル' : '予約'). 'のお知らせ',
+            'お客様から来店の'. (!$rsv ? 'キャンセル' : 'ご予約'). 'がありました。',
+            '【メニューID】'. $Reservation->getMenu()->getId(),
+            '【メニュー名】'. $Reservation->getMenu()->getTitle(),
+            '【来店日時】'. $Reservation->getStarttime(),
+            '【お客様名】'. $Reservation->getCustomer()->getName01(). $Reservation->getCustomer()->getName02(),
+            '【連絡先】'. $Reservation->getCustomer()->getPhoneNumber(),
+            '※このメッセージは送信専用です。本メッセージへのご返信には回答は出来かねますのでご了承ください。',
+            'Upstart(株)'
+        ];
+        return implode('\r\n', $body);
     }
 }

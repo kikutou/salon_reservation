@@ -29,9 +29,41 @@ file that was distributed with this source code.
         .datepicker-days td:last-child {
             color: #00f;
         }
+        .not-read {
+            color: red;
+        }
     </style>
 {% endblock stylesheet %}
-
+{% block javascript %}
+    <script>
+        $('select[name="check_status"]').change(function(){
+            var id = $(this).data('id');
+            var status = $(this).val();
+            
+            $.ajax({
+                type : "POST",
+                url : "{{url('change_status')}}",
+                data : { reservationId : id , status : status}
+            })
+            .done(function (data) {
+                alert("確認状態を変更しました。");
+                
+                var tagName = '#ex-customer-' + data.id;
+                if ($(tagName).hasClass('not-read')) {
+                    $(tagName).removeClass('not-read');
+                } else {
+                    $(tagName).addClass('not-read');
+                }
+                
+            }).fail(function (data) {
+                alert("確認状態の変更は失敗しました。");
+            });
+      
+        });
+        
+        
+    </script>
+{% endblock javascript %}
 
 {% block main %}
     <form name="search_form" id="search_form" method="post" action="">
@@ -91,11 +123,14 @@ file that was distributed with this source code.
                                         <th class="border-top-0 pt-2 pb-3">ステータス</th>
                                         <th class="border-top-0 pt-2 pb-3">予約時間</th>
                                         <th class="border-top-0 pt-2 pb-3">会員</th>
+                                        <th class="border-top-0 pt-2 pb-3">確認状態</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {% for Reservation in pagination %}
-                                        <tr id="ex-customer-{{ Reservation.id }}">
+                                        {% set notRead = false %}
+                                        {% if Reservation.checkStatus == 1 %}{% set notRead = true %}{% endif %}
+                                        <tr id="ex-customer-{{ Reservation.id }}" class="{{ notRead ? 'not-read' }}">
                                             <td class="align-middle pl-3">{{ Reservation.id }}</td>
                                             <td class="align-middle"><a href="{{ url('admin_reservation_edit', { 'id': Reservation.id}) }}">{{ Reservation.orderId }}</a></td>
                                             <td class="align-middle">{% if Reservation.menu is not null %}<a href="{{ url('admin_menu_edit', { 'id': Reservation.menu.id}) }}">{{ Reservation.menu.title }}</a>{% endif %}</td>
@@ -103,6 +138,12 @@ file that was distributed with this source code.
                                             <td class="align-middle">{% if Reservation.status == 1 %}予約可{% elseif Reservation.status == 2 %}予約済み{% elseif Reservation.status == 3 %}キャンセル{% else %}受付済み{% endif %}</td>
                                             <td class="align-middle">{{ Reservation.createdAt|date('Y/m/d H:i') }}</td>
                                             <td class="align-middle">{% if Reservation.customerId is not null %}{{ Reservation.customer.name01 }}&nbsp;{{ Reservation.customer.name02 }}{% endif %}</td>
+                                            <td class="align-middle">
+                                                <select name="check_status" class="form-control" data-id="{{ Reservation.id }}">
+                                                    <option value="1" {{ notRead ? 'selected' }}>未読</option>
+                                                    <option value="2" {{ notRead ? '' : 'selected' }}>確認済</option>
+                                                </select>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

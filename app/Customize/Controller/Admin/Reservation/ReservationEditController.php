@@ -78,6 +78,7 @@ class ReservationEditController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->getData()['status'] == 3 && $status != 3) {
                 $Reservation->setCanceledAt(new \DateTime());
+
             } elseif ($form->getData()['status'] != 3) {
                 $Reservation->setCanceledAt(null);
                 $Reservation->setCanceledAtByUser(null);
@@ -87,6 +88,12 @@ class ReservationEditController extends AbstractController
             $this->addSuccess('admin.common.save_complete', 'admin');
 
             log_info('予約編集完了', [$Reservation->getId()]);
+            $shop = $this->shopRepository->find($Reservation->getShopId());
+
+            if ($Reservation->getStatus() == 3 && $status != 3) {
+                // SMS送信
+                $this->reservationRepository->twilioSet($shop->getTelephone(), $Reservation);
+            }
             
             return $this->redirectToRoute('admin_reservation_edit', [
                 'id' => $Reservation->getId(),

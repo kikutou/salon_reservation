@@ -169,6 +169,11 @@ class ReservationController extends AbstractController
         
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // ポイント足りない場合
+            if ($menu->getPrice() > $user->getPoint()) {
+                return $this->redirectToRoute("point_notice");
+            }
+
             $Reservation = $form->getData();
             $Reservation->setCreatedAt(new \DateTime());
             $Reservation->setStarttime($request->get('starttime'));
@@ -178,69 +183,21 @@ class ReservationController extends AbstractController
             $Reservation->setMenu($menu);
             $Reservation->setShopId($request->get('shopId'));
             $Reservation->setStaff($staff);
+            $Reservation->setCheckStatus(1);
             
             $this->reservationRepository->save($Reservation);
+
+            // ポイント減算
+            $user->setPoint($user->getPoint() - $menu->getPrice());
+            $this->customerRepository->save($user);
+            $this->entityManager->flush();
+
             
             $this->addSuccess('admin.common.save_complete', 'admin');
             log_info('予約情報登録完了', [$Reservation->getId()]);
-
-            // Twilio アカウント情報
-            $account_sid = env('TWILIO_SID');
-            $auth_token = env('TWILIO_TOKEN');
-
-            // A Twilio number you own with SMS capabilities
-            $twilio_number = env('TWILIO_NUMBER');
-            $shop_number = '+81'. substr($shop->getTelephone(), 1);
-
-            // // テキストからmp3に変換
-            // $credentials = new Credentials(
-            //     env('AWS_KEY'),
-            //     env('AWS_SECRET_KEY'));
-    
-            // $client = new PollyClient([
-            //     'region' => env('AWS_REGION'),
-            //     'version' => env('AWS_VERSION'),
-            //     'credentials' => $credentials
-            // ]);
-
-            // $result = $client->synthesizeSpeech([
-            //     'Text' => '予約を取りました。',
-            //     'OutputFormat' => 'mp3',
-            //     'VoiceId' => 'Mizuki',
-            // ]);
-    
-            // $voice_path = $this->eccubeConfig['eccube_temp_image_dir'] . '/rev_call.mp3';
-    
-            // // mp3生成
-            // file_put_contents($voice_path, $result['AudioStream']);
-
-            $voiceUrl = ($request->isSecure() ? "https://" : "http://") . $request->getHost() . "/reservation/call";
-
-            try {
-
-            	$client = new Client($account_sid, $auth_token);
-                $client->messages->create(
-                    // メッセージ
-                    $shop_number,
-                    [
-                        'from' => $twilio_number,
-                        'body' => '予約を取りました。'
-                    ]
-                );
-
-                $client->calls->create(
-                    // 電話
-                    $shop_number,
-                    $twilio_number,
-                    [
-                        'url' => $voiceUrl
-                    ]
-                );
-            } catch (\Exception $e) {
-
-            	exit(var_dump($e));
-                throw new \Exception("予約情報の発信は失敗になりました。");
-            }
+            
+            // SMS送信
+            $this->reservationRepository->twilioSet($shop->getTelephone(), $Reservation, true);
 
 	        return $this->redirectToRoute("reservation_finish", [
 	        	"id" => $Reservation->getId()
@@ -267,6 +224,15 @@ class ReservationController extends AbstractController
 	    return [
 		    'reservation' => $reservation
 	    ];
+    }
+
+    /**
+	 * @Route("/reservation/point_notice", name="point_notice")
+	 * @Template("@user_data/Reservation/point_notice.twig")
+	 */
+    public function pointNotice(Request $request)
+    {
+	    return [];
     }
 
    

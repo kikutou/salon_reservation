@@ -236,6 +236,7 @@ class ShopType extends AbstractType
             ->add('tags', TextareaType::class)
             ->add('access', TextareaType::class)
             ->add('business_hours', TextareaType::class)
+            ->add('regular_holiday', TextareaType::class)
             ->add('credit_cards_info', TextareaType::class)
             ->add('price', TextareaType::class)
             ->add('seats', TextareaType::class)
@@ -311,6 +312,14 @@ class ShopType extends AbstractType
             ])
 
             ->add('memo', TextareaType::class, [
+                'required' => false,
+                'constraints' => [
+                    new Assert\Length([
+                        'max' => $this->eccubeConfig['eccube_ltext_len'],
+                    ]),
+                ],
+            ])
+            ->add('remark', TextareaType::class, [
                 'required' => false,
                 'constraints' => [
                     new Assert\Length([
