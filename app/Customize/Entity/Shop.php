@@ -194,7 +194,14 @@ class Shop extends \Eccube\Entity\AbstractEntity
      *
      * @ORM\Column(name="business_hours", type="text", length=65535, nullable=true)
      */
-    private $businessHours;
+	private $businessHours;
+	
+	/**
+     * @var string|null
+     *
+     * @ORM\Column(name="regular_holiday", type="text", length=65535, nullable=true)
+     */
+    private $regularHoliday;
 
     /**
      * @var string|null
@@ -405,6 +412,13 @@ class Shop extends \Eccube\Entity\AbstractEntity
      * @ORM\Column(name="memo", type="text", length=65535, nullable=true)
      */
 	private $memo;
+
+	/**
+     * @var string|null
+     *
+     * @ORM\Column(name="remark", type="text", length=65535, nullable=true)
+     */
+	private $remark;
 	
 	/**
      * @var \DateTime|null
@@ -810,6 +824,22 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public function setBusinessHours(?string $businessHours): void
 	{
 		$this->businessHours = $businessHours;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getRegularHoliday(): ?string
+	{
+		return $this->regularHoliday;
+	}
+
+	/**
+	 * @param null|string $regularHoliday
+	 */
+	public function setRegularHoliday(?string $regularHoliday): void
+	{
+		$this->regularHoliday = $regularHoliday;
 	}
 
 	/**
@@ -1290,6 +1320,22 @@ class Shop extends \Eccube\Entity\AbstractEntity
 	public function setMemo(?string $memo): void
 	{
 		$this->memo = $memo;
+	}
+
+	/**
+	 * @return null|string
+	 */
+	public function getRemark(): ?string
+	{
+		return $this->remark;
+	}
+
+	/**
+	 * @param null|string $remark
+	 */
+	public function setRemark(?string $remark): void
+	{
+		$this->remark = $remark;
 	}
 
 	/**

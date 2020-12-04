@@ -64,6 +64,13 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	private $status;
 
 	/**
+	 * @var int
+	 *
+	 * @ORM\Column(name="check_status", type="integer", nullable=false, options={"comment"="1:未読 2:確認済"})
+	 */
+	private $checkStatus;
+
+	/**
      * @var string|null
      *
      * @ORM\Column(name="memo", type="text", length=65535, nullable=true)
@@ -348,6 +355,24 @@ class Reservation extends \Eccube\Entity\AbstractEntity
 	public function setStatus(?int $status): self
 	{
 		$this->status = $status;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getCheckStatus(): int
+	{
+		return $this->checkStatus;
+	}
+
+	/**
+	 * @param int $checkStatus
+	 * @return self
+	 */
+	public function setCheckStatus(int $checkStatus): self
+	{
+		$this->checkStatus = $checkStatus;
 		return $this;
 	}
 

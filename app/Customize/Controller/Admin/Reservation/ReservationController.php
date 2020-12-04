@@ -24,6 +24,7 @@ use Knp\Component\Pager\Paginator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ReservationController extends AbstractController
 {
@@ -130,6 +131,22 @@ class ReservationController extends AbstractController
             'page_count' => $pageCount,
             'has_errors' => false,
         ];
+    }
+
+    /**
+     * @Route("/%eccube_admin_route%/change_status", name="change_status")
+     */
+    public function changeStatus(Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) {
+            throw new BadRequestHttpException();
+        }
+        $id = $request->request->get('reservationId');
+        $Reservation = $this->reservationRepository->find($id);
+        $Reservation->setCheckStatus($request->request->get('status'));
+        $this->reservationRepository->save($Reservation);
+        log_info('予約編集完了', [$Reservation->getId()]);
+        return $this->json(['id' => $id], 200);
     }
 
 
