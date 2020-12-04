@@ -220,31 +220,35 @@ class ReservationController extends AbstractController
 
             $voiceUrl = ($request->isSecure() ? "https://" : "http://") . $request->getHost() . "/reservation/call";
 
-            try {
-
-            	$client = new Client($account_sid, $auth_token);
-                $client->messages->create(
-                    // メッセージ
-                    $shop_number,
-                    [
-                        'from' => $twilio_number,
-                        'body' => '予約を取りました。'
-                    ]
-                );
-
-                $client->calls->create(
-                    // 電話
-                    $shop_number,
-                    $twilio_number,
-                    [
-                        'url' => $voiceUrl
-                    ]
-                );
-            } catch (\Exception $e) {
-
-            	exit(var_dump($e));
-                throw new \Exception("予約情報の発信は失敗になりました。");
-            }
+//            try {
+//
+//            	$client = new Client($account_sid, $auth_token);
+//                $client->messages->create(
+//                    // メッセージ
+//                    $shop_number,
+//                    [
+//                        'from' => $twilio_number,
+//                        'body' => '予約を取りました。'
+//                    ]
+//                );
+//
+//                $client->calls->create(
+//                    // 電話
+//                    $shop_number,
+//                    $twilio_number,
+//                    [
+//	                    "twiml" => <<<EOF
+//<Response>
+//    <Say voice="woman" language="ja-jp">こんにちは！これはテストです。</Say>
+//</Response>
+//EOF
+//                    ]
+//                );
+//            } catch (\Exception $e) {
+//
+//            	exit(var_dump($e));
+//                throw new \Exception("予約情報の発信は失敗になりました。");
+//            }
 
 	        return $this->redirectToRoute("reservation_finish", [
 	        	"id" => $Reservation->getId()
