@@ -91,7 +91,7 @@ class ReservationEditController extends AbstractController
             $shop = $this->shopRepository->find($Reservation->getShopId());
 
             if ($Reservation->getStatus() == 3 && $status != 3) {
-                // SMS送信
+                // キャンセルの場合、 SMS送信
                 $this->reservationRepository->twilioSet($shop->getTelephone(), $Reservation);
             }
             

@@ -144,7 +144,7 @@ class ReservationController extends AbstractController
     public function confirm(Request $request)
     {
 
-	    $user = $this->getUser();
+        $user = $this->getUser();
         if(!$user) {
 	        return $this->redirectToRoute('mypage_login');
 
@@ -195,11 +195,9 @@ class ReservationController extends AbstractController
             
             $this->addSuccess('admin.common.save_complete', 'admin');
             log_info('予約情報登録完了', [$Reservation->getId()]);
-
             
             // SMS送信
-//            $this->reservationRepository->twilioSet($shop->getTelephone(), $Reservation, true);
-
+            $this->reservationRepository->twilioSet($shop->getTelephone(), $Reservation, true);
 
 	        return $this->redirectToRoute("reservation_finish", [
 	        	"id" => $Reservation->getId()
@@ -235,15 +233,5 @@ class ReservationController extends AbstractController
     public function pointNotice(Request $request)
     {
 	    return [];
-    }
-
-   
-    /**
-     * @Route("/reservation/call", name="reservation_call")
-     * @Template("@call.xml")
-     */
-    public function rsvCall(Request $request)
-    {
-        return new Response($this->renderView('call.xml'));
     }
 }
