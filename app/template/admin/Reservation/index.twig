@@ -131,11 +131,11 @@ file that was distributed with this source code.
                                         {% set notRead = false %}
                                         {% if Reservation.checkStatus == 1 %}{% set notRead = true %}{% endif %}
                                         <tr id="ex-customer-{{ Reservation.id }}" class="{{ notRead ? 'not-read' }}">
-                                            <td class="align-middle pl-3">{{ Reservation.id }}</td>
-                                            <td class="align-middle"><a href="{{ url('admin_reservation_edit', { 'id': Reservation.id}) }}">{{ Reservation.orderId }}</a></td>
+                                            <td class="align-middle pl-3"><a href="{{ url('admin_reservation_edit', { 'id': Reservation.id}) }}">{{ Reservation.id }}</a></td>
+                                            <td class="align-middle">{{ Reservation.orderId }}</td>
                                             <td class="align-middle">{% if Reservation.menu is not null %}<a href="{{ url('admin_menu_edit', { 'id': Reservation.menu.id}) }}">{{ Reservation.menu.title }}</a>{% endif %}</td>
                                             <td class="align-middle">{% if Reservation.staff is not null %}<a href="{{ url('admin_staff_edit', { 'id': Reservation.staff.id}) }}">{{ Reservation.staff.name }}</a></a>{% endif %}</td>
-                                            <td class="align-middle">{% if Reservation.status == 1 %}予約可{% elseif Reservation.status == 2 %}予約済み{% elseif Reservation.status == 3 %}キャンセル{% else %}受付済み{% endif %}</td>
+                                            <td class="align-middle">{% if Reservation.status == 2 %}予約済み{% elseif Reservation.status == 3 %}キャンセル{% else %}受付済み{% endif %}</td>
                                             <td class="align-middle">{{ Reservation.createdAt|date('Y/m/d H:i') }}</td>
                                             <td class="align-middle">{% if Reservation.customerId is not null %}{{ Reservation.customer.name01 }}&nbsp;{{ Reservation.customer.name02 }}{% endif %}</td>
                                             <td class="align-middle">

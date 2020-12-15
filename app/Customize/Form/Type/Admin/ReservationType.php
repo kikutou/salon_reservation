@@ -104,7 +104,6 @@ class ReservationType extends AbstractType
             ])
             ->add('status', ChoiceType::class, [
                 'choices' => [
-                    '予約可' => 1,
                     '予約済み' => 2,
                     'キャンセル' => 3,
                     '受付済み' => 4,

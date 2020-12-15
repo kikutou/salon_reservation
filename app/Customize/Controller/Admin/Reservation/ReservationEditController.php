@@ -83,7 +83,8 @@ class ReservationEditController extends AbstractController
                 $Reservation->setCanceledAt(null);
                 $Reservation->setCanceledAtByUser(null);
             }
-            
+
+            $Reservation->setCheckStatus(2);
             $this->reservationRepository->save($Reservation);
             $this->addSuccess('admin.common.save_complete', 'admin');
 
